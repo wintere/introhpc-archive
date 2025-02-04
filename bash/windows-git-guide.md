@@ -7,9 +7,7 @@ parent: Setup
 ---
 
 # Windows Git Installation Guide
-Do not worry about the majority of these steps! I have given options that will be most useful and compatible with collaborators in the event you decide to use Git/GitHub from your Windows device after the workshop.
-
-The most important item is that Git Bash be installed.
+Any installation of Git Bash is fine for this workshop. If you have not yet installed Git Bash, we recommend the following configuration:
 
 ## Installer Steps
 1. Go to the official [Git downloads](https://git-scm.com/downloads) page
