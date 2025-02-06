@@ -13,16 +13,25 @@ This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shel
 {:toc}
 
 ## Slides: Introduction to UNIX Filesystems
-<embed src="../downloads/orientation-slides.pdf" width="800" height="500" 
+<embed src="../downloads/orientation-slides.pdf" width="700" height="450" 
  type="application/pdf">
-
+Slides not displaying? [Download them here.](../downloads/orientation-slides.pdf)
 
 
 ## Traversing the Filesystem
+The part of the operating system responsible for managing files and directories is called the filesystem. 
+It organizes our data into files and folders which hold files or other directories. 
 
-The part of the operating system responsible for managing files and directories is called the filesystem. It organizes our data into files and folders which hold files or other directories.
+![A screenshot of a folder in the Finder GUI on Mac OS](../images/finder.png)*A screenshot of a folder as it appears in the Finder GUI.*
 
-Several commands are frequently used to create, inspect, rename, and delete files and directories. To start exploring them, we’ll go to our open Git Bash or Terminal application.
+You have probably interacted with your device's filesystem through GUI  or graphical user interface applications like Finder (MacOS) or File Explorer (Windows).
+
+![A screenshot of the same folder contents from a textual ](../images/command-line.png) *A screenshot of the same folder contents as they appear from the command line.*
+
+To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal interchangeably. 
+The language to communicate with this shell application is called Bash.
+
+Today's Bash commands are used to create, inspect, rename, and delete files and directories. To start exploring them, move to the Git Bash or Terminal application that you opened during the workshop setup.
 
 ## Where Are You? `pwd, cd, ls`
 
