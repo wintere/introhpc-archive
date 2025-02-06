@@ -6,7 +6,7 @@ nav_order: 1
 
 <img src="./images/hpclogo.png" alt="drawing" width="300"/>
 
-## Introduction to High Performance-Computing
+## Introduction to High-Performance Computing
 UO Libraries, Research Advanced Computer Services (RACS), and the Lewis Center for Neuroimaging are pleased to announce our Introduction to High Performance Computing workshop series!
 This workshop is held in-person in the Knight Library DREAM Lab.
 
