@@ -7,10 +7,7 @@ nav_enabled: true
 nav_order: 2
 ---
 # SSH Key Tutorial 
-{: .no_toc }
 This lesson is adapted from the *[Connecting to the remote HPC System](https://www.hpc-carpentry.org/hpc-shell/01-connecting/index.html)* lesson of HPC Carpentry.
-- TOC
-{:toc}
 
 ## What is an SSH Key?
 SSH keys are a method for authentication for command line access to remote computing systems. 
@@ -59,7 +56,8 @@ ed25519 refers to cryptographic algorithm for generating SSH key pairs, so `id_e
 config      id_ed25519.pub  known_hosts.old  
 id_ed25519  known_hosts     
 ```
-If you have two files named `id_ed25519.pub` and `id_ed25519` respectively, wait. You will **not need** to do the next steps.
+If you have two files named `id_ed25519.pub` and `id_ed25519` respectively, wait. Skip to the `Add your SSH Key to Talapas` step.
+If you do *not* have any files with `.pub` suffix (no public/private key pair) continue to the key generation step.
 
 ## No SSH Key Pair? Create One
 From your terminal run the following command: 
@@ -90,12 +88,15 @@ To leave your SSH key without a passphrase, type **Enter** twice more.
 At this point, all of you should be ready to connect to Talapas. Type the following command into your terminal application.
 
 ```bash
-ssh [yourDuckID]@login.talapas.uoregon.edu
+ssh [yourDuckID]@login1.talapas.uoregon.edu
 ```
 If this is your first time connecting to Talapas through SSH, you will be prompted with a long, unwieldy message that ends with this line.
 
 ```ouput
-Are you sure you want to continue connecting (yes/no)?  # type "yes"!
+The authenticity of host 'login1.talapas.uoregon.edu (128.223.192.241)' can't be established.
+ED25519 key fingerprint is ...
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
 ```
 
 Type `yes` (lowercase) and press **Enter** to dismiss the message. You will not prompted with it again unless you change devices or create a new SSH key.
@@ -107,13 +108,48 @@ all log on to the same node: `login1.talapas.uoregon.edu`.
 
 Congratulations, you're now on Talapas.
 
+## Reduce Those Duo Prompts: Copying your SSH (Public Key) to Talapas
+
+Once you've logged on to a Talapas login node through the terminal for the first time, type `exit` to exit.
+
+To reduce the number of Duo 2FA prompts, you can take the following steps:
+
+1. Connect to the UO VPN **uovpn** not **uoprod** before connecting to Talapas.
+![UO VPN Screenshot](../images/vpn.JPG)
+2. Connect for the first time via `ssh`, say `yes` to the prompt.
+3. Add your SSH public key to the `~/.ssh/authorized_keys` file on Talapas.
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub [yourDuckID]@login1.talapas.uoregon.edu
+```
+
+```output
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/[YOURUSERNAME]/.ssh/id_ed25519.pub"
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+
+Number of key(s) added: 1
+```
+
+Next, check that your key has been added to the `authorized_keys` file on Talapas.
+
+```bash
+ssh [yourDuckID]@login1.talapas.uoregon.edu
+cat ~/.ssh/authorized_keys
+```
+You should see something like this if your key has been successfully added.
+
+```output
+ssh-ed25519 ... yourname@uoregon.edu
+```
+
+## Talapas Connection Troubleshooting Guide
+1. Are you on the VPN? Are you on the `uovpn`? (Do not use the `prod` vpn to connect to Talapas.)
+2. Have you connected to this **particular** login node with this SSH key before? You will have to authenticate by password the first time irregardless.
+3. Have you cleared your browser cache for the last 24 hours? (OnDemand only)
+
+
 ### Optional Post-Workshop: Add Your Key to an SSH Agent
-If you chose to add a passphrase to your SSH key, you can use
-the SSH agent to manage your key for you. 
-Unlike key creation, this step varies with your device operating system.
-
-I do not bother with this step because it's tedious to
-teach and can break your SSH configuration and disable SSH functionality with even a small mistake.
-
-If you want to use the ssh-agent, [GitHub provides a thorough tutorial that will detect
+**If (and only if) you chose to add a passphrase to your SSH key**, you can use
+the SSH agent to manage your key for you. [GitHub provides a thorough tutorial that will detect
 your browser's operating system and adjust instructions accordingly](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=mac#adding-your-ssh-key-to-the-ssh-agent).
