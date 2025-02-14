@@ -1,7 +1,7 @@
 ---
 title: Accessing Talapas
 layout: page
-permalink: /talaspas-scripting/setup.html
+permalink: /talapas-scripting/setup.html
 nav_enabled: true
 parent: Bash Scripting on Talapas
 nav_order: 1

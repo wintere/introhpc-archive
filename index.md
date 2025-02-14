@@ -17,7 +17,7 @@ This webpage archives notes, slides, and code samples from the Winter 2025 sessi
 ## Winter 2025 Schedule
 * **[Introduction to High-Performance Computing, UNIX, Bash](./bash/main.html):** February 4th, 2pm - 4pm
 * **[Bash Scripting on Talapas](./talapas-scripting/main.html):** February 6th, 2pm - 4pm 
-* **Talapas Essentials:** February 11th, 2pm - 4pm 
+* **[Talapas Essentials](./talapas-essentials/main.html):** February 11th, 2pm - 4pm 
 * **Running Slurm Jobs on Talapas:** February 13th, 2pm - 4pm 
 * **JupyterLab and Data Pipelines:** February 18th, 2pm - 4pm
 * **R on Talapas, Wrapping Up:** February 20th, 2pm - 4pm
