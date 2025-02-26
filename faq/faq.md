@@ -3,7 +3,7 @@ title: FAQ
 layout: page
 permalink: /faq.html
 nav_enabled: true
-nav_order: 6
+nav_order: 7
 ---
 # FAQ 
 
