@@ -1,4 +1,4 @@
-# Introduction High Performance Computing: Workshop Materials Archive
+# Introduction to High Performance Computing: Workshop Materials Archive
 
 Targeted towards computational researchers, these workshops will introduce UNIX commands, bash scripting, file management, OnDemand, Slurm, PIRGs, JupyterLab integration, job management, and other essential Talapas skills. 
 

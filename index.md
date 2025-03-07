@@ -20,4 +20,6 @@ This webpage archives notes, slides, and code samples from the Winter 2025 sessi
 * **[Talapas Essentials](./talapas-essentials/main.html):** February 11th, 2pm - 4pm 
 * **[Running Slurm Jobs on Talapas](./slurm/main.html):** February 18th, 2pm - 4pm 
 * **[JupyterLab and Data Pipelines](./jupyterlab/main.html):** February 20th, 2pm - 4pm
-* **R on Talapas, Wrapping Up:** February 27th, 2pm - 4pm
+* **[R on Talapas, Wrapping Up:](./r-talapas/main.html)** February 27th, 2pm - 4pm
+
+This page is maintained by [Erin M. Winter](https://library.uoregon.edu/directory/winter) of UO Libraries.
