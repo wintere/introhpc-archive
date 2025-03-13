@@ -134,10 +134,10 @@ module load rstudio/base
 
 We want load the base Rstudio module that uses whatever R module is on our path: the environment named `dualkernel`.
 
-Start Rstudio using `Rstudio`.
+Start Rstudio using `rstudio`.
 
 ```bash
-Rstudio
+rstudio
 ```
 
 We'll use `find.package()`, which, given the name of a package, looks for the filepath location of its compiled binaries.
