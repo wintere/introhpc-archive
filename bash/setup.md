@@ -17,7 +17,7 @@ Do not worry too much about these distinctions! Lessons after this point will be
 ### Windows
 Because Windows is not a UNIX-based operating system, Windows computers do not come with a Unix shell. For teaching purposes, Windows participants will rely on an emulator included with Git called Git Bash. 
 
-To start, download [Git](https://git-scm.com/downloads), install it, and open the Git Bash application from your Start Menu, which emulates a Bash shell on a Windows operating system. Need help with the install steps? I have [included a screen-by-screen guide]({% link bash/windows-git-guide.md %})
+To start, download [Git](https://git-scm.com/downloads), install it, and open the Git Bash application from your Start Menu, which emulates a Bash shell on a Windows operating system. Need help with the install steps? I have [included a screen-by-screen guide]({% link tutorials/windows-git-guide.md %})
 
 ### MacOS
 Open the Terminal application by searching for "Terminal" in Spotlight Search. The default shell [Zsh](https://support.apple.com/en-us/102360) will run all of the Bash commands in this lesson.

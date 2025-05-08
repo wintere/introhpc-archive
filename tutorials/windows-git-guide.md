@@ -1,9 +1,10 @@
 ---
-title: Windows Git Installation Guide
+title: Git Installation Guide
 layout: post
-permalink: /bash/windows-git.html
+permalink: /tutorials/windows-git.html
 nav_enabled: true
-parent: Setup
+nav_order: 2
+parent: Tutorials and Resources
 ---
 
 # Windows Git Installation Guide

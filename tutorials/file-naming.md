@@ -1,10 +1,10 @@
 ---
-title: UNIX Filename Best Practices
+title: Filename Best Practices
 layout: page
-permalink: /bash/filenames.html
-parent: Bash and the Command Line
+permalink: /tutorials/filenames.html
+parent: Tutorials and Resources
 nav_enabled: true
-nav_order: 4
+nav_order: 1
 ---
 # Filename Best Practices on UNIX Filesystems
 

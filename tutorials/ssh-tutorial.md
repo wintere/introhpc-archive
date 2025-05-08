@@ -1,8 +1,8 @@
 ---
 title: SSH Key Tutorial
 layout: page
-permalink: /talapas-scripting/ssh.html
-parent: Bash Scripting on Talapas
+permalink: /tutorials/ssh.html
+parent: Tutorials and Resources
 nav_enabled: true
 nav_order: 2
 ---
@@ -19,7 +19,7 @@ SSH keys can also be used for authentication when transferring files from shared
 In this section you will create a pair of SSH keys, a private key which you keep on your own computer and a public key which is placed on the remote HPC system that you will log in to.
 
 ### A Note on OS Compatibility
-If you installed Git Bash using my [recommended instructions]({% link bash/windows-git-guide.md %}, you should have access all the ssh key generation commands that your UNIX classmates have through Git Bash. 
+If you installed Git Bash using my [recommended instructions]({% link tutorials/windows-git-guide.md %}, you should have access all the ssh key generation commands that your UNIX classmates have through Git Bash. 
 You should not need to install any additional software.
 
 If something doesn't work as intended, please raise your hand!
@@ -147,9 +147,3 @@ ssh-ed25519 ... yourname@uoregon.edu
 1. Are you on the VPN? Are you on the `uovpn`? (Do not use the `prod` vpn to connect to Talapas.)
 2. Have you connected to this **particular** login node with this SSH key before? You will have to authenticate by password the first time irregardless.
 3. Have you cleared your browser cache for the last 24 hours? (OnDemand only)
-
-
-### Optional Post-Workshop: Add Your Key to an SSH Agent
-**If (and only if) you chose to add a passphrase to your SSH key**, you can use
-the SSH agent to manage your key for you. [GitHub provides a thorough tutorial that will detect
-your browser's operating system and adjust instructions accordingly](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=mac#adding-your-ssh-key-to-the-ssh-agent).

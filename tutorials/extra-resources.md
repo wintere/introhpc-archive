@@ -1,8 +1,8 @@
 ---
 title: Local Development Resources
 layout: page
-permalink: /bash/resources.html
-parent: Bash and the Command Line
+permalink: /tutorials/resources.html
+parent: Tutorials and Resources
 nav_enabled: true
 nav_order: 5
 ---
