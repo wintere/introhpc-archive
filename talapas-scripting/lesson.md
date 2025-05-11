@@ -4,6 +4,7 @@ layout: page
 permalink: /talapas-scripting/lesson.html
 parent: Bash Scripting on Talapas
 nav_enabled: true
+published: false
 nav_order: 3
 ---
 # Day Two: Bash Scripting on Talapas

@@ -4,6 +4,7 @@ layout: page
 permalink: /bash/lesson.html
 parent: Bash and the Command Line
 nav_enabled: true
+published: true
 nav_order: 3
 ---
 # Day One: Bash and the Command Line
@@ -11,12 +12,6 @@ nav_order: 3
 This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shell-novice/aio.html)* lesson of Software Carpentry.
 - TOC
 {:toc}
-
-## Slides: Introduction to UNIX Filesystems
-<embed src="../downloads/orientation-slides.pdf" width="700" height="450" 
- type="application/pdf">
-Slides not displaying? [Download them here.](../downloads/orientation-slides.pdf)
-
 
 ## Traversing the Filesystem
 The part of the operating system responsible for managing files and directories is called the filesystem. 
