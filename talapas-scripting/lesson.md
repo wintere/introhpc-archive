@@ -300,69 +300,6 @@ ls -F
 cubane.pdb  explosive/   octane.pdb   propane.pdb
 ethane.pdb  methane.pdb  pentane.pdb
 ```
-## Writing Output to Files: `>` and `>>`
-
-Remember the `wc` command?
-
-```bash
-wc -l *.pdb
-```
-
-```output
-  20 cubane.pdb
-  12 ethane.pdb
-   9 methane.pdb
-  30 octane.pdb
-  21 pentane.pdb
-  15 propane.pdb
- 107 total
-```
-
-Which of these protein database files contains the fewest lines?
-It's an easy question to answer when there are only six files,
-but what if there were 6000?
-Our first step toward a solution is to run the command:
-
-```bash
-wc -l *.pdb > lengths.txt
-```
-
-The greater than symbol, `>`, tells the shell to **redirect** the command's output to a
-file instead of printing it to the screen.
-
- This command prints no screen output, because
-everything that `wc` would have printed has gone into the file `lengths.txt` instead.
-If the file doesn't exist prior to issuing the command, the shell will create the file. If the file exists already, it will be silently overwritten.
-Thus, **redirect** commands require caution.
-
-`ls lengths.txt` confirms that the file exists:
-
-```bash
-ls lengths.txt
-```
-
-```output
-lengths.txt
-```
-
-We can now send the content of `lengths.txt` to the screen using `cat lengths.txt`.
-
-```bash
-cat lengths.txt
-```
-
-```output
-  20  cubane.pdb
-  12  ethane.pdb
-   9  methane.pdb
-  30  octane.pdb
-  21  pentane.pdb
-  15  propane.pdb
- 107  total
-```
-
-
-We'll continue to use `cat` in this lesson, for convenience and consistency, but it has the disadvantage that it always dumps the whole file onto your screen.
 
 ## Filtering Output with `sort`, `head`, and `tail`
 

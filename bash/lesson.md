@@ -921,81 +921,6 @@ This tells us that `methane.pdb` is the shortest of the files, with only 9 lines
 
 Using `-n 1` with `head` tells it that we only want the first line of the file; `-n 20` would get the first 20, and so on.
 
-### Warning: Redirecting to the same file
-{: .no_toc }
-
-It's a very bad idea to try redirecting
-the output of a command that operates on a file
-to the same file. For example:
-
-```bash
-sort -n lengths.txt > lengths.txt
-```
-
-Doing something like this may give you
-incorrect results and/or delete the contents of `lengths.txt`. *Do not actually run this command.*
-
-
-### Peeking at the Bottom with `tail`
-{: .no_toc }
-
-We have already met the `head` command, which prints lines from the start of a file. `tail` is similar, but prints it lines from the end of a file instead.
-
-If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and teh total lengths of all the `.pdb` files instead.
-
-```bash
-tail -n 2 sorted-lengths.txt
-```
-
-```output
-  30 octane.pdb
- 107 total
-```
-
-## Accumulating Text: `>>` and `echo`
-The most trivial of the commands that print to the terminal is `echo` which returns the strings or words you pass it as input back to you as output.
-
-```bash
-echo "Good afternoon"
-```
-
-```output
-Good afternoon
-```
-
-```bash
-echo "Good afternoon" > greeting.txt
-```
-
-```bash
-cat greeting.txt
-```
-
-```output
-Good afternoon
-```
-
-We can append to an existing file by using `>>`:
-
-```bash
-echo "Backup your files" >> greeting.txt
-cat greeting.txt
-```
-```output
-Good afternoon
-Backup your files
-```
-
-#### Quiz
-{: .no_toc }
-Which would be appropriate for a maintaining a log file that is updated with one line per day representing the
-status of scientific pipeline: `>` or `>>`?
-
-#### Answer
-{: .no_toc }
-You want to concatenate with `>>` because `>` would overwrite the previous day's output. 
-
-
 ### Waiting for Input...
 {: .no_toc }
 
@@ -1014,8 +939,6 @@ holding down the control key (<kbd>Ctrl</kbd>) and pressing the letter
 <kbd>C</kbd> once: <kbd>Ctrl</kbd>\+<kbd>C</kbd>. Then release both keys.
 
 <kbd>Ctrl</kbd>\+<kbd>C</kbd> can also be used to exit running programs, so this is an essential skill for interacting with the command line.
-
-
 
 ## Getting Help with Linux Commands: `man` and `help`
 {: .no_toc }
@@ -1058,6 +981,9 @@ As we wrap up for the day, let's clear the text that has been printed to the ter
 | cp [old] [new] | copy files or folders to a new location | cp old.txt backup/ |
 | wc [filename] | prints line, word, and char counts | wc list.txt |
 | cat [filename] | prints the contents of a file to the screen | cat list.txt |
+| command > [filename] | redirects the output of a command to file | ls > files.txt |
+| sort [filename] | sorts the lines of a file | sort -n rows.csv |
+| head -n [# lines] [file] | print the first # lines of a file or files | head -n long-novel.txt |
 | clear | clears the terminal screen (not the history) | clear |
 
 ## Learn More About Bash
