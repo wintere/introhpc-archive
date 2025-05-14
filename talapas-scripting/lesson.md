@@ -4,7 +4,7 @@ layout: page
 permalink: /talapas-scripting/lesson.html
 parent: Bash Scripting on Talapas
 nav_enabled: true
-published: false
+published: true
 nav_order: 3
 ---
 # Day Two: Bash Scripting on Talapas
@@ -13,7 +13,38 @@ This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shel
 - TOC
 {:toc}
 
-## The Talapas Shell
+## Where Are You? (Revisited)
+Open your terminal application.
+
+Enter the `hostname` command, which prints the name of the current computer or "host" for the shell. 
+
+```bash
+hostname
+```
+
+The result will vary from person to person, as this should be the system name of *your* laptop.
+```output
+UO-2012173
+```
+
+Let's connect to one of the Talapas login nodes through `ssh`. For the purposes of this exercise, let's connect to `login2.talapas.uoregon.edu`, one of the four login nodes.
+
+
+```bash
+ssh [yourDuckID]@login2.talapas.uoregon.edu
+```
+
+You will prompted for the password for your DuckID. When you enter your password, you should see a welcome screen that looks something like this, followed by a `$` prompt symbol.
+
+```output
+# Welcome to Talapas!
+# Data on Talapas is NOT backed up. Data management is each users responsibility.
+#
+#
+# Need support? Please visit the Talapas Knowledge Base:
+#https://uoracs.github.io/talapas2-knowledge-base/
+```
+
 You should now be inside your home directory on Talapas. Just like on your local filesystem, the default working directory on login is your home directory.
 
 ```bash
@@ -35,10 +66,10 @@ We're going to talk about the process of transferring files to and from the clus
 ![talapas-structure](../images/talapas-structure-abstract.png) *A simplified diagram of the structure of Talapas*
 Whether you choose to access Talapas through the web terminal or through the command line, you will start at a **login node**. 
 
-The **login node** is a place to prepare input data, organizes, edit code, and configure environment object but it's not the appropriate node for executing non-trivial code. The **login node** should be used to launch jobs on **compute nodes**.
+The **login node** is a place to prepare input data, organizes, edit code, and configure environment object but it's not the appropriate node for executing non-trivial code. The **login node** should be used to launch Slurm jobs on **compute nodes**.
 
 How much work is too much work? Any script that takes longer than a few seconds should be run on a **compute node** instead. 
-There are only four login nodes to the hundreds of compute nodes.
+There are only four login nodes relative to the hundreds of compute nodes.
 
 **Before running computationally intensive code check if are you running locally, on a login node, or on an interactive node.**
 
@@ -50,7 +81,7 @@ hostname
 ```
 
 ```ouput
-login1.talapas.uoregon.edu
+login2.talapas.uoregon.edu
 ```
 
 As expected, we are on one of the login nodes. There are four login or "head" nodes for Talapas numbered `login1`, `login2`, `login3`, and `login4` respectively.
@@ -96,15 +127,14 @@ Now that we're on Talapas, let's do an ls command with the long-listing argument
 I want to take this opportunity to talk about UNIX permissions now that we're all on machines with the same operating system. 
 Because software **cannot manipulate open, write or execute files without permission to do so for each file**, permissions are a common source of code failures on shared filesystems.
 
-Though many of you come from different labs, we all share a *racs_training* PIRG. That means, everyone should have access to the racs_training folder located in `/projects/racs_training`.
+Though many of you come from different labs, we all share a *racs_training* PIRG. That means, everyone should have access to the shared `racs_training` folder located in `/projects/racs_training`. Let's examine the permissions of a certain file in the `racs_training` folder.
 
 ```bash
-cd /projects/racs_training
-ls -lh
+ls -lh /projects/racs_training/intro-hpc-s25/emw/greeting.txt
 ```
 
 ```output
--rw-r--r--.   1 emwin   is.racs.pirg.racs_training   52 Feb  6 11:30 test.txt
+-rwxr--r--. 1 emwin is.racs.pirg.racs_training 29 May 13 16:06 /projects/racs_training/intro-hpc-s25/emw/greeting.txt
 ```
 
 It's time to unpack results from the `-l` or long listing flag. Let's see if we can understand **what each field of a given row represents**,
@@ -119,14 +149,13 @@ working left to right.
    - The first set of `rwx` are the permissions that the owner of the file has.
    - The second set of `rwx`s are permissions that members of the file's
      group share (in this case, the group is named `racs_training`).
-   - The third set of `rwx`s are permissions that everyone else with access to
-     this computer can do with a file. 
+   - The third set of `rwx`s are permissions for everyone else not in the group. 
 2. **References:** This counts the number of references ([hard
    links](https://en.wikipedia.org/wiki/Hard_link)) to the item (file, folder,
    symbolic link or "shortcut").
 3. **Owner:** This is the username of the user who owns the file. Their
    permissions are indicated in the first permissions field.
-4. **Group:** This is the ACL/PIRG group associated with the file. Members of
+4. **Group:** This is the PIRG (racs_training) associated with the file. Members of
    this user group have permissions indicated in the second permissions field.
 5. **Size of item:** This is the number of bytes in a file, in human-readable form thanks to the -h flag.
 6. **Time last modified:** This is the last time the file was modified.
@@ -141,14 +170,14 @@ in the Talapas-specific lesson.
 
 We should all be able to `cat` this file to the terminal.
 ```bash
-cat test.txt
+cat /projects/racs_training/intro-hpc-s25/emw/greeting.txt
 ```
 
 ```output
 Is this the first file you've looked at on Talapas?
 ```
 
-However, we'll get a permissions error if we try to read Gabriele's home directory.
+We can't run the `ls` or `cat` command on files and folders we don't have permission to read. For example, I'll get a permissions error if I try to list the contents of someone else's home directory.
 
 ```bash
 ls /home/ghayden/
@@ -162,11 +191,12 @@ Note that, even if there were files in Gabriele's home directory that *were* rea
 
 To share a file or directory that you own with someone in your PIRG, you can grant read and execute privileges for them within the shared `/project/[pirg_name]` directory. However, you must also set the same privileges on any parent directories above the item you're sharing. The execute bit for directories controls whether or not the folder can be **traversed**. Without execute permissions, you cannot see the child folders and files of folders you can otherwise read.
 
-The best place to share files are in folders that are shared by your research group, like a project `/projects/[pirg_name[/` directory.
+The best place to share files are in folders that are shared by your research group, like a project `/projects/[pirg_name]/` directory.
 
 #### Quiz
 {: .no_toc }
-On websites like StackOverflow, you will often see bad advice that recommends you use the command `chmod 777` or `chmod -R 777` to alter the permissions of shared input files.
+On websites like StackOverflow, you may advised to use the command `chmod 777` or `chmod -R 777` to alter the permissions of shared input files.
+Test this theory on an empty file in your home directory.
 
 ```bash
 touch the-universal-file.txt
@@ -186,10 +216,10 @@ ls -lh the-universal-file.txt
 ```
 
 This is a bad idea because it grants read, write, and execute permissions to **all** users for the file. 
-In the majority of cases, your problems can be solved by giving **group** read access using  to files and execute access on folders for your labmates' traversal. 
+In the majority of cases, your problems can be solved by giving **group** read access using  to files and execute access on folders for your colleagues traversal. 
 
 
-## Transferring Files to Talapas with `scp`
+## Transferring Files to and from Talapas with `scp`
 
 Speaking of separate filesystems, today's zip file isn't on Talapas.
 Let's move it there with the `scp` command.
@@ -204,7 +234,7 @@ exit
 You should see a message like this after exiting.
 ```ouput
 logout
-Connection to login1.talapas.uoregon.edu closed.
+Connection to login2.talapas.uoregon.edu closed.
 ```
 
 You should be back on your local machine. Use `pwd` to check that you are in your home directory and `ls talapas-bash.zip` to make sure you have today's zip folder ready.
@@ -223,10 +253,10 @@ and from Talapas.
 
 Just like the `cp` command, the arguments for `scp` are indicated in [source] [destination] order. 
 
-To indicate a remote filesystem location, use the `[yourDuckID]@login1.talapas.uoregon.edu:` prefix. Every character after the : refers to the filesystem as appears on a Talapas login node.
+To indicate a remote filesystem location, use the `[yourDuckID]@login[node].talapas.uoregon.edu:` prefix. Every character after the : refers to the filesystem as appears on a Talapas login node.
 
 ```bash
-scp talapas-bash.zip [yourDuckID]@login1.talapas.uoregon.edu:~
+scp talapas-bash.zip [yourDuckID]@login2.talapas.uoregon.edu:~
 ```
 
 ```output
@@ -235,30 +265,32 @@ talapas-bash.zip                              100% 7187KB   5.4MB/s   00:01
 
 #### Quiz
 {: .no_toc }
-How would I copy the `/project/racs_training/test.txt` file to my home directory on my laptop using `scp`?
+How would I copy the `/projects/racs_training/intro-hpc-s25/emw/greeting.txt` file to my home directory on my laptop using `scp`? (Use auto-complete on this lengthy path.)
 
 **Hint**: Remember what the `.` character means?
 #### Answer
 {: .no_toc }
 ```bash
-scp [yourDuckID]@login1.talapas.uoregon.edu:/projects/racs_training/test.txt .
+scp [yourDuckID]@login2.talapas.uoregon.edu:/projects/racs_training/intro-hpc-s25/emw/greeting.txt .
 ```
 
 ```output
-test.txt                     00%   52     0.8KB/s  00:00
+greeting.txt                     00%   52     0.8KB/s  00:00
 ```
-Check the file transfer worked by inspecting its contents in `nano`. Remember `nano`?
+Check the file transfer worked by using `cat` to concatenate its contents to the terminal.
 
 ```bash
-nano test.txt
+cat greeting.txt
 ```
 
-Use <kbd>Ctrl</kdb>+<kbd>X</kdb> to exit Nano.
+```output
+First Talapas file transfer?
+```
 
-Let's get to learning Bash! Let's ssh to Talapas again. Use the arrow keys to traverse your command history and grab the right command.
+Let's get back to learning Bash. Use the arrow keys to traverse your command history and run the `ssh` command again.
 
 ```bash
-ssh [yourDuckID]@login1.talapas.uoregon.edu
+ssh [yourDuckID]@login2.talapas.uoregon.edu
 ```
 
 Confirm your zip file safely arrived at its destination in your Talapas home directory with an `ls`.
@@ -276,9 +308,17 @@ Now, let's unzip it from the command line using the `unzip` command. (This may t
 unzip talapas-bash.zip
 ```
 
+Use `ls -F` to confirm that you have an unzipped `talapas-bash` folder in your home directory.
+```output
+...
+talapas-bash.zip
+talapas-bash/
+...
+```
+
 When the file is unzipped, change your current working directory
-to talpas-bash. 
-The contents of the folder should be very familiar to you at this point
+to `talapas-bash`. 
+The contents of the folder should be familiar to you at this point.
 
 ```bash
 cd talapas-bash
@@ -300,79 +340,42 @@ ls -F
 cubane.pdb  explosive/   octane.pdb   propane.pdb
 ethane.pdb  methane.pdb  pentane.pdb
 ```
+### Refresher: Sorting and Pipes
+{: .no_toc }
 
-## Filtering Output with `sort`, `head`, and `tail`
-
-Next we'll use the `sort` command to sort the contents of the `lengths.txt` file.
-
-The file `talapas-bash/exercise-data/numbers.txt` contains the following lines:
-
-```source
-10
-2
-19
-22
-6
+In our last session, we used the `*` symbol and the `wc` to generate the number of lines in each of the `.pdb` files in this folder.
+```bash
+wc -l *.pdb 
 ```
-
-If we run `sort` on this file, the output is:
 
 ```output
-10
-19
-2
-22
-6
+20  cubane.pdb
+12  ethane.pdb
+9  methane.pdb
+30  octane.pdb
+21  pentane.pdb
+15  propane.pdb
+107  total
 ```
 
-If we run `sort -n` on the same file, we get this instead:
+We then *redirected* the output of this command to a text file named lengths using the `>` or redirect command. The directionality is important here.
 
-```output
-2
-6
-10
-19
-22
+```bash
+wc -l *.pdb > lengths.txt
 ```
 
-This is because the `-n` option specifies a numerical rather than an alphanumerical sort.
-
-The `sort` command alone does *not* change input files; it prints their lines in sorted order to the screen.
+Using the `sort -n` command, we sorted the lines of the lengths.txt file numerically, affectively putting the lines counts for each `.pdb` file in ascending order.
 
 ```bash
 sort -n lengths.txt
 ```
 
-```output
-  9  methane.pdb
- 12  ethane.pdb
- 15  propane.pdb
- 20  cubane.pdb
- 21  pentane.pdb
- 30  octane.pdb
-107  total
-```
-
-We can put the sorted list of lines in another temporary file called `sorted-lengths.txt`
-by putting `> sorted-lengths.txt` after the command,
-just as we used `> lengths.txt` to put the output of `wc` into `lengths.txt`.
-
-
-Once we've done that,
-we can run another command called `head` to get the line of `sorted-lengths.txt`:
+We wrote the output of this command to `sorted-lengths.txt`.
 
 ```bash
 sort -n lengths.txt > sorted-lengths.txt
-head -n 1 sorted-lengths.txt
 ```
 
-```output
-  9  methane.pdb
-```
-
-This tells us that `methane.pdb` is the shortest of the files, with only 9 lines.
-
-Using `-n 1` with `head` tells it that we only want the first line of the file; `-n 20` would get the first 20, and so on.
 
 ### Warning: Redirecting to the same file
 {: .no_toc }
@@ -392,9 +395,19 @@ incorrect results and/or delete the contents of `lengths.txt`. *Do not actually 
 ### Peeking at the Bottom with `tail`
 {: .no_toc }
 
-We have already met the `head` command, which prints lines from the start of a file. `tail` is similar, but prints it lines from the end of a file instead.
+The last `head` command, which prints the first few lines of a text file. 
+By default it prints the first 10, but we can use the -n flag followed by a number to indicate how many lines we want to print.
+```bash
+head -n 1 sorted-lengths.txt
+```
 
-If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and teh total lengths of all the `.pdb` files instead.
+```out
+9 methane.pdb
+```
+
+`tail` is similar, but prints it lines from the end of a file instead.
+
+If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and the total lengths of all the `.pdb` files instead.
 
 ```bash
 tail -n 2 sorted-lengths.txt
@@ -431,12 +444,23 @@ Good afternoon
 We can append to an existing file by using `>>`:
 
 ```bash
-echo "Backup your files" >> greeting.txt
+echo 'Backup your files' >> greeting.txt
 cat greeting.txt
 ```
 ```output
 Good afternoon
 Backup your files
+```
+
+```bash
+echo 'Talapas doesn't count as backup' >> greeting.txt
+cat greeting.txt
+```
+
+```output
+Good afternoon
+Backup your files
+Talapas doesn't count as backup
 ```
 
 #### Quiz
@@ -454,8 +478,8 @@ In our example of finding the file with the fewest lines,
 we used intermediate files `lengths.txt` and `sorted-lengths.txt` to store output.
 This is a confusing way to work because
 even once you understand what `wc`, `sort`, and `head` do,
-those intermediate files make it hard to follow what's going on.
-We can make it easier to understand by running `sort` and `head` together:
+those intermediate files make it hard to follow.
+A special character `|` can allow us to the connect Bash commands together.
 
 ```bash
 sort -n lengths.txt | head -n 1
@@ -470,7 +494,8 @@ It tells the shell that we want to use
 the output of the command on the left
 as the input to the command on the right.
 
-This has removed the need for the `sorted-lengths.txt` file.
+
+This removes the need for the `sorted-lengths.txt` file.
 
 Nothing prevents us from chaining pipes consecutively.
 We can for example send the output of `wc` directly to `sort`,
@@ -511,11 +536,7 @@ The redirection and pipes used in the last few commands are illustrated below:
 ### Putting it Together: Pipes and Filters
 {: .no_toc }
 
-This idea of linking programs together is why Unix has been so successful.
-Instead of creating enormous programs that try to do many different things,
-Unix programmers focus on creating lots of simple tools that each do one job well,
-and that work well with each other.
-This programming model is called 'pipes and filters'.
+This idea of linking commands through pipelines is part of the Unix 'pipes and filters' model.
 We've already seen pipes;
 a **filter** is a program like `wc` or `sort`
 that transforms a stream of input into a stream of output.
@@ -526,10 +547,15 @@ can be combined with every other program that behaves this way as well.
 
 Let's put some of these skills into practice.
 
-Move into the `mice` directory.
+Move into the `mice` directory and take a look at the files there.
+
 ```bash
-cd ..
-cd mice
+cd ../mice
+ls
+```
+
+```output
+Animals.txt  README.md  Tasks.txt  Visit.txt  citation.txt
 ```
 
 We can pipe the results of the `ls` command to `wc -l` to count how many objects in the current working directory. 
@@ -579,77 +605,39 @@ LickContactTime StartDate       StartTime       StartTimecode
 EndDate EndTime EndTimecode     VisitDuration   Session
 ```
 
-## Fun with Tab-Separated Values: `cut`
-
-The `cut` command is used to remove or ‘cut out’ certain sections of each line in the file, and cut expects the lines to be separated into columns by a <kbd>Tab</kbd> character, just like our mouse data.
-
-Cut must be used in combination with a `-f` argument indicating the fields we want to extract. In the event your data *isn't* tab-separated, you can use `-d` to specify delimiters like commas.
-
-Let's try it with `Animals.txt`.
-
-```bash
-cut -f 1 Animals.txt
-```
-
-```output
-Animal
-GK-1894
-GK-1895
-GK-1896
-GK-1897
-GK-1898
-GK-1899
-GK-1900
-GK-1901
-GK-1902
-GK-1903
-GK-1904
-GK-1905
-GK-1890
-GK-1891
-GK-1892
-GK-1893
-```
-
-This gives us the first column of the tab-separated value file: namely, the unique identifiers for each mouse in the study.
-
-#### Quiz
-{: .no_toc }
-> Datasets are often keyed or indexed by the value in their first column. What if, instead of the entire first column, I wanted to know the name of the first variable in each of the three text files? As a hint, you'll need to combine the last two operations we discussed with a pipe.
-
-#### Answer
-{: .no_toc }
-```bash
-head -n 1 Animals.txt Tasks.txt Visit.txt | cut -f 1
-```
-
-```output
-==> Animals.txt <==
-Animal
-
-==> Tasks.txt <==
-Date
-
-==> Visit.txt <==
-VisitID
-```
-
 ## Finding Lines in Files with `grep`
 
 Searching for something in one or more files is something we'll often need to do, so let's introduce a command for doing that: `grep` (short for **global regular expression print**). As the name suggests, it supports regular expressions and is therefore only limited by your imagination, the shape of your data, and - when working with thousands or millions of files - the processing power at your disposal.
 
 
-Now let's try our first search to find all the instances in the mouse study where mouse `GK-1893` is documented or observed:
+Now let's try our first search to find the row corresponding to mouse `GK-1893` in `Animals.txt`. 
 
-`grep GK-1893 *.txt`
+```bash
+grep GK-1893 Animals.txt
+```
 
-Grep always takes a PATTERN first, then the file, files, or folder of files to be searched for that pattern.
+```output
+GK-1893 981098102199262 Female  IC b    4
+```
+
+`Visit.txt` has 172197 rows documenting each behavioral event for each mouse in the study.
+Let's use `grep`, `wc`, and `|` to find how many times (in how many rows) mouse `GK-1983` was documented in `Visit.txt`.
+
+```bash
+grep GK-1893 Visit.txt | wc - l
+```
+
+```output
+11675
+```
+
+Grep always takes a pattern first, followed by the file or files to be searched for that pattern.
 
 Remember that the shell will expand `*.txt` to a list of all the `.txt` files in the directory. `grep` will then search these for instances of the string "1990" and print the matching lines. 
 
-If you're debugging a large programming project, the ability to quickly search for specific functions in the command line is crucial. Bash's text search functionality is very, very fast.
+If you're debugging a large programming project, the ability to quickly search for specific function or statements through the command line is crucial. Bash's text search functionality is very fast.
 
-By default grep prints the entire line, not just the portion that happens to match. It is also case-sensitive UNLESS we pass the -i flag.
+By default `grep` prints the entire line, not just the portion that happens to match. It is also case-sensitive UNLESS we pass the -i flag.
 
 Compare the results of these two queries.
 
@@ -689,7 +677,9 @@ How can we use `|` and `grep` and `wc` to count how many times you've typed the 
 
 #### Answer
 {: .no_toc }
+```bash
 history | grep 'pwd' | wc -l
+```
 
 
 ## Finding Files by Name with `find`
@@ -805,7 +795,7 @@ find . -type f
 But what if we want to specify files with names (or patterns for names)? This is helpful when tracking down data with a detailed metadata structure. We can use the the `-name` option for this.
 
 ```bash
-find . -name '*.md
+find . -name '*.md'
 ```
 
 ```output
@@ -824,71 +814,126 @@ When you give batch jobs to Slurm on Talapas, you will have typically give them 
 Let's use nano to write our first script.
 
 ```bash
-nano first-script.sh`
+nano hello.sh`
 ```
 
-```vim
+```bash
 #!/bin/bash
+# This is a comment, which will be ignored
+# The line below prints "Hello World" to standard out
 echo "Hello World"
 ```
 As always, use <kbd>Ctrl</kbd>+<kbd>O</kbd> then **Enter** to
-write out your text to `first-script.sh`. Then use <kbd>Ctrl</kbd>+<kbd>X</kbd> to exit `nano`.
+write out your text to `hello.sh`. Then use <kbd>Ctrl</kbd>+<kbd>X</kbd> to exit `nano`.
 
 The `#!/bin/bash` comment is important, it communicates which executable (which shell) should run this script. Normally `#` indicates a commented line in Bash and causes the line to be ignored during execution.
 
 Now, if we try to run it like any old command, we'll get an error.
 
-`first-script.sh`
+```bash
+hello.sh
+```
 
-We need to specify that bash should run this script.
+You could choose to execute it using `source hello.sh`, which is much like running `python3 myfile.py` or `Rscript myscript.R` on Python and R scripts respectively. 
+The `source` command tells the shell to execute each line of a text file as a sequence of commands.
 
-`bash first-script.sh`
+```bash
+source hello.sh
+```
 
-This mode of executing the script is much like running `python3 myfile.py` or `Rscript myscript.R`
+```output
+Hello World
+```
 
-If the script doesn't execute, make sure it has execute permissions. 
+Alternatively, we can prefix `./` to the filepath of the script to execute it, as long as it has execute permissions. 
 
-`ls -lh first-script.sh`
-`chmod u+x first-script.sh`
-`./first-script.sh`
+```bash
+ls -lh hello.sh
+chmod o+x hello.sh
+./hello.sh
+```
 
-You should now see a "Hello World" message. 
-Congratulations, you've written your first script!
+```output
+Hello World
+```
+ 
+Congratulations, you've written your Bash first script!
 
-For our next exercise, move up to the `talapas-bash` parent directory.
+For our next exercise, move to the `talapas-bash` parent directory.
 
 `cd ~/talapas-bash`
 
-Now, let's write a script that uses the `find` command we learned to find files that end in `.txt` in the exercise-data` directory.
+Now, let's write a script that uses the `find` command to find files that end in `.txt` in the exercise-data` directory.
 
-`nano find-text.sh`
-
+```bash
+nano find-text.sh
 ```
+
+```bash
 #!/bin/bash
-find exercise-data -name "*.txt"
+find exercise-data -name '*.txt'
 ```
+
 Let's run it to see if it works.
 
-`chmod u+x find-text.sh`
+```bash
+chmod +x find-text.sh
+./find-text.sh
+```
 
-`./find-text.sh`
+```output
+exercise-data/numbers.txt
+exercise-data/alkanes/lengths.txt
+exercise-data/alkanes/sorted-lengths.txt
+exercise-data/mice/citation.txt
+exercise-data/mice/Tasks.txt
+exercise-data/mice/Animals.txt
+exercise-data/mice/Visit.txt
+exercise-data/writing/journal/day1.txt
+exercise-data/writing/journal/day2.txt
+exercise-data/writing/haiku.txt
+exercise-data/writing/thesis/quotations.txt
+```
 
-It works, so let's move it to that scripts directory I already have.
+It works, so let's move it to that scripts directory we already have.
 
-`mv find-text.sh scripts`
+```bash
+mv find-text.sh scripts
+ls -F
+```
 
-An `ls` shows the file is gone.
+```output
+books/		scripts/
+exercise-data/
+```
 
 Navigating to the `scripts` folder, we can see it's there now.
 
-`cd scripts`
-
-Now, something different is going to happen when I run the script now. Why?
-
 ```bash
-./find-text.sh`
+cd scripts
+ls
 ```
 
+```output
+a-slow-script.sh
+find-text.sh
+```
+
+#### Quiz
+{: .no_toc }
+Now, something different is going to happen when I run the `find-text.sh` from inside the `scripts` directory.
+Why?
+
+```bash
+./find-text.sh
+```
+
+```output
+find: exercise-data: No such file or directory
+```
+
+#### Answer
+{: .no_toc }
 The reason we get a "no such file or directory" error is that the filesystem as seen by a script is relative to the *current working directory*.
 
 The *current working directory* is the `scripts` diretory, so the `exercise-data` folder is nowhere to be found.
@@ -896,20 +941,29 @@ The *current working directory* is the `scripts` diretory, so the `exercise-data
 Let's use **command-line arguments** to make this script more flexible.
 
 ```bash
-nano find-text.sh`
+nano find-text.sh
 ```
 
-```output
+We're going to replace `exercise-data` with a special symbol that indicates an *argument*.
+```bash
 #!/bin/bash
 find "$1" -name '*.txt'
 ```
 
-Inside a shell script, `$1` means 'the first filename (or other argument) on the command line'. The quotes around it are to capture files with spaces in their names.
+Inside a Bash script, `$1` means the first filename (or other argument) on the command line. 
+The quotes around it are to capture files with spaces in their names.
 
-We can now run our script like this:
+We can now run our script like this on an arbitrary directory like `mice` instead:
 
 ```bash
-./find-text.sh ../exercise-data/
+./find-text.sh ../exercise-data/mice/
+```
+
+```output
+../exercise-data/mice/citation.txt
+../exercise-data/mice/Tasks.txt
+../exercise-data/mice/Animals.txt
+../exercise-data/mice/Visit.txt
 ```
 
 To reference additional arguments, use `$2`, `$3` and so on. 
@@ -921,9 +975,8 @@ Those variables control its execution,
 so by changing their values
 you can change how the shell and other programs behave.
 
-
 Every variable has a name.
-By convention, variables that are always present are given upper-case names.
+By convention, variables that are always present (constants) are given upper-case names.
 
 Let's show the value of the variable `HOME`, or the path of *your* home directory:
 
@@ -953,19 +1006,97 @@ echo $HOSTNAME
 ```
 
 ```output
-login1.talapas.uoregon.edu
+login2.talapas.uoregon.edu
 ```
 
 To set our own variables for a given terminal session, we can use the following syntax:
 
 ```bash
-MY_DOG='Cleo'
-echo $MY_DOG
+FAMILY_PET='Scout'
+echo $FAMILY_PET
 ```
 
 ```output
-CLEO
+Scout
 ```
+
+## Stdout, Stderr
+
+Thus far, you have learned to run Bash commands in which output is either directed to
+stdout, the terminal, or [redirected](https://www.gnu.org/software/bash/manual/html_node/Redirections.html?ref=vegastack.com) to a file.
+
+We will now differentiate between standard out (stdout) and (stderr).
+
+For any given command or program, output can be written to stdout or stderr. 
+Stderr, by default, is a separate stream from stdout, even though it prints to the terminal by default too.
+
+Let's navigate back to the `talapas-bash` directory and do a quick `ls`.
+
+```bash
+cd
+ls
+```
+
+```output
+books		scripts
+exercise-data
+```
+
+This command runs without creating errors; it prints a list of folders to stdout.
+But what if try to inspect the contents of a folder that doesn't exist?
+
+```bash
+ls FAKEDIR
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+If we try to redirect the output of this command, something strange happens: the error message
+still prints to the terminal and `log.txt` remains empty.
+
+```bash
+ls FAKEDIR > log.txt
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+To redirect stderr to file, we must prefix `>` with `2>` to indicate that 
+we want to redirect stderr. 
+
+```bash
+ls FAKEDIR 2> error.txt
+cat error.txt
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+A command that does *not* print to  stderr will returns it output through
+stdout as usual.
+
+```bash
+echo "This won't error out" 2> error.txt
+```
+
+```output
+This won't error out
+```
+
+Because nothing was written out to stderr, `error.txt` is an empty file.
+```bash
+cat error.txt
+```
+
+```output
+```
+
+The notion of separate output and err streams becomes relevant on Talapas because Slurm allows you to write error logs and output logs 
+to separate files, which makes debugging jobs that produce large amounts of textual output easier.
 
 ## Loops: Easy as `for`, `do`, `done`
 **Loops** are a programming construct which allow us to repeat a command or set of commands
@@ -974,11 +1105,15 @@ As such they are key to productivity improvements through automation.
 Similar to wildcards and tab completion, using loops also reduces the
 amount of typing required (and hence reduces the number of typing mistakes).
 
-Let's navigate to our scripts directory to get an example of for-loop syntax in Bash. It may come in handy for your work if you're doing batch processing.
+Let's copy a certain folder from the `racs_training` folder to your home directory.
+Use the tab auto-complete feature to help you!
 
-`cd ~/talapas-bash/scripts`
+```bash
+cp -r /projects/racs_training/intro-hpc-s25/emw .
+cd emw
+```
 
-If you look inside, you'll see a script called `a-slow-script.sh`.
+If you look inside your copy of the `emw` directory, you'll see a script called `a-slow-script.sh`.
 
 Use `cat` to print it to the terminal.
 
@@ -1039,19 +1174,30 @@ for (i in 1:15){ # 1-15 inclusive
 Check that you have permission to run the script.
 
 ```bash
-ls -lha
+ls -lh
 ```
 
 ```output
--rw-r--r--. 1 emwin uoregon 152 Feb  3 22:48 a-slow-script.sh
+-r--r--r--. 1 emwin uoregon  159 May 14 08:38 a-slow-script.sh
 ```
 
-In this case I, the owner, do *not* have permission to run this file. I need to add **user** permissions.
+In this case, I do *not* have permission to execute this file. I need to add **execute** permissions.
 
 ```bash
-chmod u+x a-slow-script
-./a-slow-script
+chmod +x a-slow-script
+ls -lh
 ```
+
+```output
+-r-xr-xr-x. 1 emwin uoregon  159 May 14 08:38 a-slow-script.sh
+```
+
+Now, I can run the script.
+
+```bash
+./a-slow-script.sh
+```
+
 
 ```output
 1
@@ -1061,116 +1207,116 @@ chmod u+x a-slow-script
 
 This script will run for at least fifteen seconds before terminating on its own, which could be bothersome.
 
-This brings me to **Ctrl+C**. Use it terminate running commands or programs that are running too slowly, caught in infinite loops, or are printing more to the terminal than you desire.
+This brings me to **Ctrl+C**. Use it to commands or programs that are running too slowly, caught in loops, or printing too much text to standard out.
 
 Cancel the script using **Ctrl+C** before it prints all fifteen numbers.
 
-We're now done with the `talapas-bash` folder. Let's look at our first **job script** as a sneak preview of how the Talapas scheduler, Slurm works.
+Loops are a crucial control flow construct among all programming languages.
+Looking ahead, one way of *parallelizing* code written in *serial form* is to identify independent, non-sequential operations
+represented by a loop and to convert them into separate or threads processes that can be 
+distributed on several CPU-cores simultaneously.
 
 ## Our First Slurm Job
 
-Inside your home directory on Talapas, let's make a new folder called `TalapasWorkshop`. 
+You will learn more about Slurm in detail next week. Before we go, I'd like to demonstrate the role Bash plays in distributing work among compute nodes in the cluster.
+
+Navigate inside the `bash-where-who` directory and inspect `a-little-script.sh`.
 
 ```bash
-mkdir TalapasWorkshop
-cd TalapasWorkshop
-```
-
-Once inside the Talapas Workshop directory, you're going to use the `cp` command to take a script I've already written and put a copy in your directory. This is important because you want to avoid a situation where multiple people are modifying the same at the same time. The best practice is to edit a copy.
-
-```bash
-cp /projects/racs_training/emwin/first.sh .
-```
-
-You'll also need to copy the associated Python file to the current directory.
-
-```bash
-cp /projects/racs_training/emwin/hello_world.py .
-```
-
-Confirm that you can see the script components in the current directory.
-
-```bash
-ls
+cd bash-where-who/
+cat a-little-script.sh
 ```
 
 ```output
-first.sh  hello_world.py
+#!/bin/bash
+
+echo "Good afternoon!"
+echo "This script is running as" $(whoami)
+echo "This script is running on" $HOSTNAME
+echo 'Done.'
 ```
 
-Now, let's concatenate `first.sh` to the terminal and dissect it piece by piece.
+Mark the script as executable *by our group* and run it.
 
 ```bash
-cat first.sh
+chmod g+x a-little-script.sh
+./a-little-script.sh
+```
+
+```output
+Good afternoon!
+This script is running as emwin
+This script is running on login2.talapas.uoregon.edu
+Done.
+```
+
+As we would expect, this script runs on the login node (where we shouldn't do significant work) and writes its output to the terminal.
+When we run batch jobs on Talapas, we want work to be done *on the compute nodes* of the cluster and for their textual output, if any, to be written to a log file to be inspected later.
+
+Move up a directory using `cd`.
+
+```bash
+cd ..
+```
+
+Now, let's concatenate `slurm-greeting.sh` to the terminal and dissect it piece by piece.
+
+```bash
+cat slurm-greeting.sbatch
 ```
 
 ```bash
 #!/bin/bash
 #SBATCH --account=racs_training
-#SBATCH --job-name=first
 #SBATCH --partition=compute
+#SBATCH --output=first-log.txt
+#SBATCH --error=first-error.txt
 #SBATCH --time=0-00:05:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=500M
-#SBATCH --output=first-log.txt
-#SBATCH --error=first-error.txt
 
-module purge
-module load miniconda3/20240410
-echo "Running on $HOSTNAME"
-python3 hello_world.py
+echo "Good afternoon!"
+echo "This script is running as" $(whoami)
+echo "This script is running on" $HOSTNAME
+echo 'Done.'
 ```
 
-At the top, it has the `!/bin/bash` sequence to indicate to Slurm that this is a batch script. Slurm will not run files that are not shell scripts.
+At the top, it has the `!/bin/bash` sequence to indicate to Slurm that this is a Bash script. Slurm will not run files that are not Bash scripts.
 
-The lines beginning `module purge` and `module load` are common to almost all Slurm jobs. They are used to remove any existing modules, then load the softwar modules necessary for running the job. 
-In this case, `miniconda` is loaded so Python can be run. 
-An R job, however, would load something like `R/4.3.2` instead `miniconda3/20240410`.
-Modules will be discussed at length in the Talapas lessons.
-
-What follows are sequences of comments that are not comments. These are parameters that are passed to Slurm that will decide when, and with how many resources, your job is run.
+What follows are sequences of special comments that tell Slurm *how* to run this script. 
+These are parameters that are passed to Slurm that will decide when, where, and with how many resources, your job is run.
 
 * **account** must be a valid PIRG. For this exercise, it's racs_training. In the future, this will be your lab's PIRG.
 * **job-name** allows you to set the job name of your job for easy debugging and management. Modify this to FirstJob[YourDuckID]
 * **partition** indicates which of Talapas's partitions this job will run on. For most purposes, **compute** is appropriate. 
 * **time** total run time limit in (HH:MM:SS) before SLURM kills the job. Real-world jobs will take minutes to hours rather than seconds.
 * **cpus-per-task** should be set to 1 for jobs that do not explicitly use multiprocessing libraries like OpenMPI. 
-* **mem-per-cpu** should be set to the total amou
+* **mem-per-cpu** amount of memory per CPU core
 * **output** the file location where the ouput from **stdout** should be logged
 * **error** the file location where the output from **stderror** should be logged. will generate an empty file on job with no errors.
 
-Let's check the Python script too! Python students: what does this do?
+
+Let's try running this file two ways: as a Bash script and as input to Slurm.
+First, give yourself e**x**ecute permissions using `chmod`. Then, run the file using `./slurm-greeting.sbatch`.
 
 ```bash
-cat hello_world.py
+chmod +x slurm-greeting.sbatch
+./slurm-greeting.sbatch
 ```
 
 ```output
-print("Hello world!")
+Good afternoon!
+This script is running as emwin
+This script is running on login2.talapas.uoregon.edu
+Done.
 ```
 
-It prints the string "hello word" and exits.
-
-Normally, it's not good practice to run a script on a login node, but I want to you go ahead and so.
-
-First, give yourself **u**ser e**x**ecute permissions using `chmod`. Then, run the file using `./first.sh`.
-
-```bash
-chmod u+x first.sh
-./first.sh
-```
-
-```output
-Running on login2.talapas.uoregon.edu
-Hello world!
-```
-
-Looks good? But we don't want it to run on the login node. Let's pass it to SLURM using `sbatch`.
+But we don't want it to run on the login node. Let's pass it to SLURM using `sbatch`.
 
 After you've carefully configured the job, queueing it is easy.
 
 ```bash
-sbatch first.sh
+sbatch slurm-greeting.sbatch
 ```
 
 ```output
@@ -1252,7 +1398,6 @@ We will dive deeper into this topic next week!
 | [cmd] >> [file] | concatenate redirected output of [cmd] to file | echo "Another Line" >> file.txt |
 | history | show command line history | history |
 | grep [pattern] [file or files] | find instances of pattern in file | grep -r 'assignment' . |
-| cut -d [delimiter] -f [field #] | cut delimited data at field # | cut -f 2 tabbed_data.tsv |
 
 ## Learn More 
 - [*Linux file permissions explained*](https://www.redhat.com/en/blog/linux-file-permissions-explained), Scott McBrien.

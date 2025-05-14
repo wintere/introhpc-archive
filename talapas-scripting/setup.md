@@ -32,7 +32,7 @@ A web app in the OnDemand client that provides command line to access to Talapas
 - Unlike with SSH from your personal terminal, **you can't transfer files to/from your local machine here**
 
 ## Tired of All the Duo 2FA Prompts? UO VPN
-While using the UO VPN is **not required** for today's activities, [RACS recommends](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755758386/Release+Notes+for+the+new+Talapas2+2024) that you install and connect to the [UO VPN](https://service.uoregon.edu/TDClient/2030/Portal/KB/ArticleDet?ID=31471) by following this guide.
+While using the UO VPN is **not required** for today's activities, [RACS recommends](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_login_to_talapas/) that you install and connect to the [UO VPN](https://service.uoregon.edu/TDClient/2030/Portal/KB/ArticleDet?ID=31471) by following this guide.
 You will receive fewer Duo 2FA authentication prompts if you 
 connect to Talapas while on the UO VPN.
 
