@@ -849,7 +849,7 @@ Alternatively, we can prefix `./` to the filepath of the script to execute it, a
 
 ```bash
 ls -lh hello.sh
-chmod o+x hello.sh
+chmod u+x hello.sh
 ./hello.sh
 ```
 
