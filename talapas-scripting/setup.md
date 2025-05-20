@@ -45,9 +45,8 @@ Open Terminal (MacOS, Linux) or Git Bash (Windows) and you're ready for today's 
 ![screenshot of SSH access in Git Bash](../images/ssh-example.JPG) *A screenshot of ssh usage through Git Bash*
 
  This is the primary and most versatile way to access Talapas. 
- It allows users to transfer files, schedule jobs, and run interactive jobs all from the same terminal application. However, you need to create an SSH key to use this method.
- 
- Because you only need to set up SSH key access to Talapas once **per device**, we will go through the SSH access tutorial as a class. Setting up SSH keys can be tedious and unintuitive, but they make connecting to Talapas a breeze once you've set them up.
+ It allows users to transfer files, schedule jobs, and run interactive jobs all from the same terminal application.  SSH makes connecting to Talapas a breeze once you've [generated an SSH key and added it to Talapas](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_login_to_talapas/#setting-up-ssh-keys-for-mac-and-linux).
+ This allows for passwordless authentication as long as you are on the VPN.
 
 <br> 
 <span class="fs-5">

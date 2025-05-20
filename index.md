@@ -16,8 +16,8 @@ This webpage archives notes, slides, and code samples from the workshop series. 
 
 ## Spring 2025 Schedule
 * [**Why HPC, Introduction to Bash:**](./bash/main.html) May 12th, 2pm - 4pm
-* **Bash Scripting on Talapas:** May 14th, 2pm - 4pm
-* **Talapas 101:** May 19th, 2pm - 4pm
+* [**Bash Scripting on Talapas:**](./talapas-scripting/main.html) May 14th, 2pm - 4pm
+* [**Talapas Essentials:**](./talapas-essentials/main.html) May 19th, 2pm - 4pm
 * **Running Slurm Jobs on Talapas:** May 21st, 2pm - 4pm
 * **Advanced Slurm:** May 28th, 2pm - 4pm
 * **JupyterLab on Talapas:** June 2nd, 2pm - 4pm

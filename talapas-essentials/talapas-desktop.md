@@ -14,7 +14,8 @@ Want to use Talapas with a GUI? You can use the [Talapas Desktop App](https://on
 Because Talapas Desktop sessions are connected to compute nodes, you can run code (through the terminal) or software applications directly.
 
 ## Configuring Talapas Desktop
-The [Talapas Desktop App](https://ondemand.talapas.uoregon.edu/pun/sys/dashboard/batch_connect/sys/bc_desktop/talapas/session_contexts/new) can be found by navigating to **OnDemand**->**Interative Apps**->**Talapas Desktop**. Before the applications starts, you will encounter a configuration screen.
+The [Talapas Desktop App](https://ondemand.talapas.uoregon.edu/pun/sys/dashboard/batch_connect/sys/bc_desktop/talapas/session_contexts/new) can be found by navigating to **OnDemand**->**Interative Apps**->**Talapas Desktop**. Before the applications starts, you will encounter a configuration screen. 
+Just like any Talapas job, the more resources you ask for, the longer it will take to schedule.
 
 ![example Talapas desktop session](../images/talapas-desktop.JPG)*An example Talapas Desktop configuration screen*
 
@@ -46,7 +47,7 @@ Click the **Launch Talapas Desktop** button to open the application.
 
 ## Running Code on Talapas Desktop
 
-Talapas Desktop sessions are held on **compute** nodes. That means you can open the Mate Terminal application in the top left corner,
+Talapas Desktop sessions are held on **compute** nodes. That means you can open the **Mate Terminal application in the top left corner,
 load desired modules, and run scripts against data on GPFS *without* interacting with Slurm because you're already on the *interactive* partition.
 ![example session](../images/talapas-desktop-work.JPG)
 
@@ -61,7 +62,7 @@ Want to run RStudio on Talapas? Perform the following steps:
     ```
 3. Load the `rstudio` module. Freddy has a custom version with the following name.
      ```bash
-    module load rstudio/2024.04.1-base
+    module load rstudio/base
     ```
 4. Launch the RStudio app by typing the following into the terminal.
     ```bash
@@ -70,3 +71,11 @@ Want to run RStudio on Talapas? Perform the following steps:
 5. RStudio should launch inside Talapas Desktop.
 
 ![rstudio](../images/rstudio.JPG)*An example RStudio session on Talapas Desktop*
+
+## Cleaning Up
+
+Your Talapas Desktop job will continue to run until the requested time limit elapses or until you cancel the job.
+
+If you finish your work before the time limit ends, you 
+can free up resources for other Talapas users by clicking the red **Delete** button
+for the job as it appears on the OnDemand sessions page.
