@@ -9,156 +9,41 @@ nav_order: 2
 
 # Slurm on Talapas
 
-### Scheduling Tips
-* Read the resource descriptions carefully: jobs that exceed their request time, memory, or processor usage will be automatically killed.
-* Need to run for more than 24 hours? You must use `computelong`, `gpulong`, or `memorylong`.
-* Most jobs should have `--ntasks-per-node=1` and `--cpus-per-task=1` if they do not reference tools or code that is explicitly multiprocessor code.
-
-### Optimization with `seff`
-
-Want to know how much of the resources you requested a finished job used? Try the `seff` command.
-
-```bash
-seff 31471361
-```
-
-```output
-Job ID: 31471361
-Cluster: talapas
-User/Group: emwin/uoregon
-State: CANCELLED (exit code 0)
-Cores: 1
-CPU Utilized: 00:00:00
-CPU Efficiency: 0.00% of 00:02:48 core-walltime
-Job Wall-clock time: 00:02:48
-Memory Utilized: 456.00 KB
-Memory Efficiency: 0.09% of 500.00 MB
-```
-Adjust your resource requests accordingly after your job runs. Be courteous and jobs won't be deprioritized. 
-Remember that your job's runtime is its **queue time + execution time**, so asking for too much can make your job run *slower*.
-
-### Helper Scripts from RACS
-
-RACS has a few helper scripts for looking at which hardware features are available for specific nodes on Talapas.
-
-This script shows which nodes have which models of GPU.
-```bash
-/packages/racs/bin/slurm-show-gpus
-```
-
-```output
-n0110 gpu:nvidia_l40:2(S:0)
-n0149 gpu:nvidia_a100_80gb_pcie_1g.10gb:28(S:1)
-n0150 gpu:nvidia_a100_80gb_pcie_3g.40gb:4(S:1)
-n0151 gpu:nvidia_a100_80gb_pcie_1g.10gb:21(S:1)
-...
-```
-
-This script lists the *processor* for each node.
-```bash
-/packages/racs/bin/slurm-show-features`
-```
-
-```output
-n0029 intel,broadwell,e5-2690
-n0030 intel,broadwell,e5-2690
-n0031 intel,broadwell,e5-2690
-n0032 intel,broadwell,e5-2690
-...
-```
-
-### GPU Jobs
-Let's examine an example GPU job in detail: `gpu.sbatch`.
-
-Only three partitions are compatible with GPUs:
-* gpu
-* gpulong
-* interactivegpu
-
-Each node in a GPU partition has **at most** 4 GPUS.
-
-```bash
-#!/bin/bash
-
-#SBATCH --partition=gpu                  ### Partition (like a queue in PBS)
-#SBATCH --account=racs_training          ### Account used for job submission
-
-### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
-#SBATCH --job-name=gpu_hello_world       ### Job Name
-#SBATCH --output=%x-%j.out               ### File in which to store job output
-#SBATCH --error=%x-%j.err                ### File in which to store job error messages
-
-#SBATCH --time=0-00:05:00                ### Wall clock time limit in Days-HH:MM:SS
-#SBATCH --nodes=1                        ### Number of nodes needed for the job
-#SBATCH --mem=500M                       ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
-#SBATCH --gpus=1                         ### Number of GPUs to request 
-#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
-#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
-#SBATCH --mail-type=BEGIN,END
-#SBATCH --mail-user=YOURDUCKID@uoregon.edu     
-
-### Load needed modules
-module purge
-module load cuda/12.4.1
-module list
-
-### Run your actual program
-nvidia-smi
-```
-
-* You request a gpu with the --gpus argument. It's not enough to go run on a GPU partition.
-* If you need to select certain nodes within a partition, the `--constraint=` flag, can allow you to specify certain nodes based on job constraints.
-* Every GPU requires a CPU too!
-
-### Bonus: Email Me My Job Status
-Running a really long job? Tired of checking `squeue`?
-
-SLURM can even email you when jobs reach certain states:
-
-```bash
-### #SBATCH --mail-type=BEGIN,END,FAIL      
-### #SBATCH --mail-user=<duckID>@uoregon.edu
-```
-
-Add the lines above to your Sbatch script with *your* DuckID. You should get an email from Slurm when the job begins and finishes (whether in success or failure.)
-
-## Shared Resource Etiquette
-- Close out your jobs when you're done!
-- Book your interactive jobs for as long as you need, but not longer.
-- You will not be warned time is about to run out. Track your own time conscientiously. 
+[Slurm](https://slurm.schedmd.com/slurm.html) is the job scheduling software used on the Talapas. While Talapas has scheduling policies, partitions, and PIRGs that are specific to UO, 
+Slurm is used for job scheduling on high-performance computing clusters around the world.
 
 ## Lesson Setup
 For this lesson, you will need to connect to a Talapas login node through a shell application of your choice.
 
 For convenience, we recommend the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
 
-To start, check that you're in your home directory with `pwd`.
+To start, make sure you are in your home directory.
 
 ```bash
-pwd
+cd ~
 ```
 
-Copy today's exercises from `/projects/racs_training/resources/slurm_examples_day2/` into your current directory. Don't forget `-r` to recursively copy the contents!
+
+Copy today's exercises from `/projects/racs_training/intro-hpc-s25/slurm/part2/` into your home directory. Don't forget `-r` to recursively copy the contents!
 
 ```bash
-cp -r /projects/racs_training/resources/slurm_examples_day2/ .
+cp -r /projects/racs_training/intro-hpc-s25/slurm/part2 .
 ```
 
-Navigate inside the `slurm_examples_day2` using `cd`.
+Navigate inside the `part2` folder using `cd`.
 
 ```bash
-cd slurm_examples_day2
+cd part2
 ```
 
 Check that you see the following files inside with `ls`.
 
 ```bash
-ls
+ls -F
 ```
 
 ```output
-array.sbatch  books.sbatch           random_test.py       test.sh
-books         parallel_steps.sbatch  serial_steps.sbatch
+array.sbatch*  books/  books.sbatch*  hello.sbatch*  parallel_steps.sbatch*  random.py*  serial_steps.sbatch*  steps.sh*
 ```
 
 ## Batch Scheduling with `sbatch`
@@ -333,6 +218,123 @@ for each step.
 This feature is useful because it allows you to monitor the time, resources
 spent on each step of a complicated batch job.
 
+### Scheduling Tips
+* Read the resource descriptions carefully: jobs that exceed their request time, memory, or processor usage will be automatically killed.
+* Need to run for more than 24 hours? You must use `computelong`, `gpulong`, or `memorylong`.
+* Most jobs should have `--ntasks-per-node=1` and `--cpus-per-task=1` if they do not reference tools or code that is explicitly multiprocessor code.
+
+### Optimization with `seff`
+
+Want to know how much of the resources you requested a finished job used? Try the `seff` command.
+
+```bash
+seff 31471361
+```
+
+```output
+Job ID: 31471361
+Cluster: talapas
+User/Group: emwin/uoregon
+State: CANCELLED (exit code 0)
+Cores: 1
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:02:48 core-walltime
+Job Wall-clock time: 00:02:48
+Memory Utilized: 456.00 KB
+Memory Efficiency: 0.09% of 500.00 MB
+```
+Adjust your resource requests accordingly after your job runs. Be courteous and jobs won't be deprioritized. 
+Remember that your job's runtime is its **queue time + execution time**, so asking for too much can make your job run *slower*.
+
+### Helper Scripts from RACS
+
+RACS has a few helper scripts for looking at which hardware features are available for specific nodes on Talapas.
+
+This script shows which nodes have which models of GPU.
+```bash
+/packages/racs/bin/slurm-show-gpus
+```
+
+```output
+n0110 gpu:nvidia_l40:2(S:0)
+n0149 gpu:nvidia_a100_80gb_pcie_1g.10gb:28(S:1)
+n0150 gpu:nvidia_a100_80gb_pcie_3g.40gb:4(S:1)
+n0151 gpu:nvidia_a100_80gb_pcie_1g.10gb:21(S:1)
+...
+```
+
+This script lists the *processor* for each node.
+```bash
+/packages/racs/bin/slurm-show-features`
+```
+
+```output
+n0029 intel,broadwell,e5-2690
+n0030 intel,broadwell,e5-2690
+n0031 intel,broadwell,e5-2690
+n0032 intel,broadwell,e5-2690
+...
+```
+
+### GPU Jobs
+Let's examine an example GPU job in detail: `gpu.sbatch`.
+
+Only three partitions are compatible with GPUs:
+* gpu
+* gpulong
+* interactivegpu
+
+Each node in a GPU partition has **at most** 4 GPUS.
+
+```bash
+#!/bin/bash
+
+#SBATCH --partition=gpu                  ### Partition (like a queue in PBS)
+#SBATCH --account=racs_training          ### Account used for job submission
+
+### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
+#SBATCH --job-name=gpu_hello_world       ### Job Name
+#SBATCH --output=%x-%j.out               ### File in which to store job output
+#SBATCH --error=%x-%j.err                ### File in which to store job error messages
+
+#SBATCH --time=0-00:05:00                ### Wall clock time limit in Days-HH:MM:SS
+#SBATCH --nodes=1                        ### Number of nodes needed for the job
+#SBATCH --mem=500M                       ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
+#SBATCH --gpus=1                         ### Number of GPUs to request 
+#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
+#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --mail-user=YOURDUCKID@uoregon.edu     
+
+### Load needed modules
+module purge
+module load cuda/12.4.1
+module list
+
+### Run your actual program
+nvidia-smi
+```
+
+* You request a gpu with the --gpus argument. It's not enough to go run on a GPU partition.
+* If you need to select certain nodes within a partition, the `--constraint=` flag, can allow you to specify certain nodes based on job constraints.
+* Every GPU requires a CPU too!
+
+### Bonus: Email Me My Job Status
+Running a really long job? Tired of checking `squeue`?
+
+SLURM can even email you when jobs reach certain states:
+
+```bash
+### #SBATCH --mail-type=BEGIN,END,FAIL      
+### #SBATCH --mail-user=<duckID>@uoregon.edu
+```
+
+Add the lines above to your Sbatch script with *your* DuckID. You should get an email from Slurm when the job begins and finishes (whether in success or failure.)
+
+## Shared Resource Etiquette
+- Close out your jobs when you're done!
+- Book your interactive jobs for as long as you need, but not longer.
+- You will not be warned time is about to run out. Track your own time conscientiously. 
 
 ## Serial Processing: One Core and One Task at A Time
 Do an `ls` to see the other job files available to you.
@@ -1243,3 +1245,13 @@ module load miniconda3/202410
 conda activate r-4.3.3_environment
 R [my-special-r-script].R
 ```
+
+## Today's Slurm Commands
+
+| command | description | example usage |
+| ----------- | --------------- | ------------- |
+| sbatch [jobfile] | queues a Slurm job | `sbatch my_job.sh` |
+| sacct | lists (your) recent jobs and subjobs | `sacct` |
+| squeue -u [user] | gets status of running or queued slurm jobs for user | `squeue -u [yourDuckID]` |
+| scancel [jobid] | cancels job jobid | `scancel [jobid]` |
+| srun | launches interactive shell session on a compute node | `srun --partition=compute --account=racs_training --pty bash` |
