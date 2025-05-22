@@ -396,156 +396,108 @@ Slurm is used for job scheduling on high-performance computing clusters around t
 To schedule jobs on Talapas, you must give Slurm a *partition* where the job must run
 and an *account* (PIRG) associated with the job.
 
-Slurm then manages a queue of jobs that determines which node(s) on a partition your job will run.
+Slurm manages a queue of jobs that determines which node(s) on a partition your job will run.
 
 ### Scheduling Simple Jobs with Slurm
 
 To practice with Slurm tasks, connect to a Talapas login node. For this exercise, feel free to use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
 
+## Batch Scheduling with `sbatch`
 
-Once you're on Talapas, copy this folder of example jobs from `racs_training` to your home directory as follows.
-```bash
- cp -r /projects/racs_training/intro-hpc-s25/slurm/part1 .
- ```
+Batch scripts in Slurm are configured [through special comments](https://slurm.schedmd.com/sbatch.html) prefixed with `#SBATCH`. 
 
-Open the job in a text editor of your choice. I have reproduced the contents below.
-
-```bash
- nano hello.sbatch
-```
+All batch jobs should have `#!/bin/bash` on the first line followed by `#SBATCH` options in any order. 
+It doesn't matter what order you specify your `#SBATCH` options in as long you specify them one per line.
 
 ```bash
 #!/bin/bash
-
-#SBATCH --partition=compute              ### Partition (like a queue in PBS)
-#SBATCH --account=racs_training          ### Account used for job submission
-
-### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
-#SBATCH --job-name=hello_world_python    ### Job Name
-#SBATCH --output=%x-%j.out               ### File in which to store job output
-#SBATCH --error=%x-%j.err                ### File in which to store job error messages
-
-#SBATCH --time=0-00:05:00                ### Wall clock time limit in Days-HH:MM:SS
-#SBATCH --nodes=1                        ### Number of nodes needed for the job
-#SBATCH --mem=500M                       ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
-#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
-#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
-
-### Load needed modules
-module purge
-module load python3/3.11.4
-module list
-
-### Run your actual program
-python3 hello.py
+#SBATCH --partition=compute
+#SBATCH --account=racs_training
 ```
-Let's parse this file using the comments as a guide! To learn more, see the [Slurm documentation](https://slurm.schedmd.com/sbatch.html) for `sbatch`.
+This set of comments represent the **minimum** required options for a Slurm job of Talapas:
+* a valid Talapas partition
+* an account (PIRG)
 
-* This job runs for a maximum of five minutes
-(`0-00:05:00`) on one node and one CPU core of that node.
-* It requests 500MB of RAM.
-* The job output will be written `hello_world_python-[jobid].out` and `hello_world_python-[jobid].err` respectively.
-* It loads the `python3/3.11.4` module.
-* It lists the current modules loaded and prints it to standard output.
-* It runs a file in the `slurm_examples` directory called `hello.py` that prints to standard output. 
-
-To submit your job file, run the `sbatch` command.
 
 ```bash
-sbatch hello.sbatch
+nano first.sbatch
 ```
+
+Inside `nano`, enter the following lines. When you're finished, use <kbd>Ctrl</kbd>+<kbd>O</kbd>
+and <kbd>Ctrl</kbd>+<kbd>X</kbd> to write out to the `first.sbatch` file and then exit `nano`.
+
+```bash
+#!/bin/bash
+#SBATCH --partition=compute
+#SBATCH --account=racs_training
+echo "Hello!"
+```
+
+### Required Slurm Job Elements
+* `#!/bin/bash` on the first line
+* `--partition=[a valid partition]` 
+* `--account==[your PIRG]`
+
+All other parameters like `mem`, `ntasks`, and `--cpus-per-task` have default values by partition.
+The default value for job memory as configured through the `--mem-per-cpu` is 4GB per CPU.
+For single core jobs, that means *single-core jobs start with 4GB RAM unless you specify otherwise*.
+
+Let's run our minimum viable job by passing it to the `sbatch` command.
+
+```bash
+sbatch first.sbatch
+```
+
+You will get a response with a (unique) job number when your job is submitted successfully.
 
 ```output
-JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
------------- ---------- ---------- ---------- ---------- ---------- -------- 
-34658037     hello_wor+    compute racs_trai+          1     FAILED      1:0 
-34658037.ba+      batch            racs_trai+          1     FAILED      1:0 
-34658037.ex+     extern            racs_trai+          1  COMPLETED      0:0
+Submitted batch job 34704033
 ```
 
-Look at your job history with `sacct`. Uh oh, there's an error.
-
-Check the error log using `cat`.
+Check your job's status in the queue using the `squeue` command. The `--me` flag is a
+helpful trick if you don't want to type `-u [yourDuckID]` each time.
 
 ```bash
-cat hello_world_python-[YOURJOBID].err
+squeue --me
 ```
+
+With a job this simple, it's probably already finished.
 
 ```output
-
-Currently Loaded Modules:
-  1) miniconda-t2/20230523   2) python3/3.11.4
-
- 
-Traceback (most recent call last):
-  File "/gpfs/home/emwin/part1/hello.py", line 2, in <module>
-    print(dictionary['b']) # Should Raise KeyError !!!
-          ~~~~~~~~~~^^^^^
-KeyError: 'b'
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 ```
 
-This is a common mistake when using Python dictionaries. 
-Check the original Python file in a command line text editor like `nano`.
-
-```bash
-nano hello.py
-```
-
-```python
-print("Hello World !!")
-
-dictionary = {'a': 1}
-print(dictionary['b']) # This should raise a KeyError
-```
-
-For those of you who don't know Python, this can be fixed by checking the dictionary for a valid entry: `a`.
-Change the last line to the following in `nano`, then use <kbd>Ctrl</kbd>+<kbd>O</kbd> and <kbd>Ctrl</kbd>+<kbd>X</kbd> 
-to modify the file.
-
-```python
-print(dictionary['a']) # This will not raise a KeyError
-```
-
-Now that your file is saved, rerun your fixed job.
-
-```bash
-sbatch hello.sbatch
-```
-
-```output
-Submitted batch job 34658055
-```
-
-Running `sacct` will show your job completed successfully.
+If you see an empty queue like this, go ahead and check your most recent *finished* jobs with `sacct`.
 
 ```bash
 sacct
 ```
 
 ```output
-JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
------------- ---------- ---------- ---------- ---------- ---------- -------- 
-34658055     hello_wor+    compute racs_trai+          1  COMPLETED      0:0 
-34658055.ba+      batch            racs_trai+          1  COMPLETED      0:0 
-34658055.ex+     extern            racs_trai+          1  COMPLETED      0:0
+34704033     first.sba+    compute racs_trai+          1  COMPLETED      0:0 
+34704033.ba+      batch            racs_trai+          1  COMPLETED      0:0 
+34704033.ex+     extern            racs_trai+          1  COMPLETED      0:0
 ```
 
-Check the output log to see the results of your job. You'll want to pick the *second* and later run's log. Note that because each log is named for the jobid, and jobids are unique, your logs will not overwrite each other.
+This job doesn't have a specified output and error log file name, so it uses the slurm defaults: `slurm-[jobid].out`.
+Doing an ls, we see a file that was created with the default parameters at `slurm-[jobid].out`.
+You can see where a `#SBATCH --job-name` might be more helpful in the debugging process.
+
+Let's check the contents of the output log.
+If it worked as intended, we should the results of the `echo` command from `first.sbatch`.
 
 ```bash
-cat hello_world_python-[yourJOBID].out
+cat slurm-34704033.out
 ```
 
-To check the status of queued jobs, use the `squeue` command. Do not use squeue without an argument unless you want to see *all* the queued jobs on Talapas.
-
-```bash
-squeue -u [yourDuckID]
-```
-
-To cancel a job, use the `scancel` command followed by the jobid of the job you want to cancel.
-
-```bash
-scancel [yourjobid]
+```output
+Hello!
 ```
 
 We will look at Slurm and several associated commands in detail in the next session!
+
+## Shared Resource Etiquette
+- Be conscientious about your use of shared storage in the `/projects/[yourPIRG]` folder.
+- Close out your jobs when you're done!
+- Book your interactive jobs for as long as you need, but not longer.
+- You will not be warned when time is about to run out when running interactive jobs or the Talapas Desktop app. Track your own time conscientiously. 
