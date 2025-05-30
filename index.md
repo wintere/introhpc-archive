@@ -19,7 +19,7 @@ This webpage archives notes, slides, and code samples from the workshop series. 
 * [**Bash Scripting on Talapas:**](./talapas-scripting/main.html) May 14th, 2pm - 4pm
 * [**Talapas Essentials:**](./talapas-essentials/main.html) May 19th, 2pm - 4pm
 * [**Running Slurm Jobs on Talapas:**](./slurm/main.html) May 21st, 2pm - 4pm
-* **Advanced Slurm:** May 28th, 2pm - 4pm
+* [**Advanced Slurm:**](./advanced-slurm/main.html) May 28th, 2pm - 4pm
 * **JupyterLab on Talapas:** June 2nd, 2pm - 4pm
 
 This page is maintained by [Erin M. Winter](https://library.uoregon.edu/directory/winter) of UO Libraries.
