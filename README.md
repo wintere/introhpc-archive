@@ -6,11 +6,14 @@ This webpage archives notes, slides, and code samples from the Introduction to H
 
 ## Spring 2025 Schedule
 * [**Why HPC, Introduction to Bash:**](https://wintere.github.io/introhpc-archive/bash/main.html) May 12th, 2pm - 4pm
-* **Bash Scripting on Talapas:** May 14th, 2pm - 4pm
-* **Talapas 101:** May 19th, 2pm - 4pm
-* **Running Slurm Jobs on Talapas**: May 21st, 2pm - 4pm
-* **Advanced Slurm:**: May 28th, 2pm - 4pm
-* **JupyterLab on Talapas**: June 2nd, 2pm - 4pm
+
+## Spring 2025 Schedule
+* [**Why HPC, Introduction to Bash:**](https://wintere.github.io/introhpc-archive/bash/main.html) May 12th, 2pm - 4pm
+* [**Bash Scripting on Talapas:**](https://wintere.github.io/introhpc-archive/talapas-scripting/main.html) May 14th, 2pm - 4pm
+* [**Talapas Essentials:**](https://wintere.github.io/introhpc-archive/talapas-essentials/main.html) May 19th, 2pm - 4pm
+* [**Running Slurm Jobs on Talapas:**](https://wintere.github.io/introhpc-archive/slurm/main.html) May 21st, 2pm - 4pm
+* [**Advanced Slurm:**](/https://wintere.github.io/introhpc-archive/advanced-slurm/main.html) May 28th, 2pm - 4pm
+* [**JupyterLab on Talapas:**](https://wintere.github.io/introhpc-archive/jupyterlab/main.html) June 2nd, 2pm - 4pm
 
 This page is maintained by [Erin M. Winter](https://library.uoregon.edu/directory/winter) of UO Libraries.
 
