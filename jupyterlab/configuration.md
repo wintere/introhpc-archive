@@ -9,38 +9,47 @@ nav_order: 2
 
 # Configuration
 
-## Setup
-For this lesson, you will need to connect to a Talapas login node through a shell application of your choice.
+## Checking for the `jupyter-racs-s25` Conda Environment
+If you participated in the Advanced Slurm session, you should already have the `jupyter-racs-s25` environment available for today's activity. 
 
+If you did not participate or want to make sure, connect to a Talapas login node through a shell application of your choice.
 For convenience, we recommend the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
 
-Copy today's examples from `/projects/racs_training/resources/jupyter_examples/` into your Talapas home directory using `cp`.
+Load the miniconda module and run the `conda env list` command, piping the results to grep to check for an environment named *jupyter-racs-s25*.
 
 ```bash
-cp -r  /projects/racs_training/resources/jupyter_examples/ .
+module load miniconda3/20240410
+conda env list | grep "jupyter-racs-s25"
 ```
-Navigate inside the `jupyter_examples` directory.
+
+If you have an environment of this name configured, the command will return a single line referencing an environment in your home directory. Skip to the JupyterLab configuration section.
+
+```output
+jupyter-racs-s25         /home/emwin/.conda/envs/jupyter-racs-s25
+```
+
+
+If you do not have an environment of this name configured, the command will result in no output. 
+
+### Building the `jupyter-racs-s25` Environment 
+
+To build the *jupter-racs-s25* environment, create a new file named *jupyter.yml* in `nano`.
 
 ```bash
-cd jupyter_examples/
+nano jupyter.yml
 ```
 
-Inspect `jupyter_rt.yml` using `nano`.
-
-```bash
-nano jupyter_rt.yml
-```
-
-```python
-name: jupyter_rt
+Copy the following text into the .yml file.
+```yml
+name: jupyter-racs-s25
 channels:
   - conda-forge
 dependencies:
   - numpy
   - pandas
+  - matplotlib
   - seaborn
   - jupyter
-  - pickleshare
   - r-base
   - r-essentials
   - r-irkernel
@@ -48,85 +57,32 @@ dependencies:
   - ipywidgets
   - pip
   - pip:
-    - nibabel
-    - bash_kernel
     - git+https://github.com/conery/nbscan.git
 ```
 
-All custom conda environments
-require the Jupyter module to be installed in the environment to be compatible with the JupyterLab OnDemand app.
+Save `nano` with <kbd>Ctrl</kbd>+<kbd>O</kbd>, <kbd>Enter</kbd> to confirm writing out the file, and then <kbd>Ctrl</kbd>+<kbd>X</kbd> to exit.
 
-You don't need to understand all of the packages listed
-for today's exercise. Everyone needs `jupyter`. Most need 
-ubiquitous pacages like `numpy` and `seaborn`. Others, for example, like `nibabel` are specific to neuroimaging.
-
-To build this environment, you will use a Slurm script. Use `cat` to inspect its contents.
+Create the environment defined the `juptyer.yml` configuration file with `conda env create`.
 
 ```bash
-cat build_jupyter_rt.srun
+conda env create -f jupyter.yml
 ```
 
-```bash
-#!/bin/bash
-#SBATCH --job-name=build_jupyter_rt
-#SBATCH --account=racs_training
-#SBATCH --partition=compute
-#SBATCH --output=logs/%x-%A.out
-#SBATCH --error=logs/%x-%A.err
-#SBATCH --time=0:30:0
-
-module purge
-module load miniconda3/20240410 
-conda env create -f jupyter_rt.yml --solver=libmamba
-conda activate jupyter_rt
-python -m bash_kernel.install
-```
-
-When you are satisfied, submit the script using `sbatch`.
-
-```bash
-sbatch build_jupyter_rt.srun
-```
+When the build process is finished, you will get the following message.
 
 ```output
-Submitted batch job 31728410
-```
-
-### Solvers
-The right conda solver accelerates the resolution of dependencies when creating virtual environments.
-Use `--solver=libmamba` whenever you create conda environments.
-
-When the environment configuration job finishes, 
-check the log directory for the output logs.
-
-
-```bash
-ls logs
-```
-
-```output
-build_jupyter_rt-31728410.err  build_jupyter_rt-31728410.out
-```
-
-Let's check the last few lines of the output log with tail.
-
-```bash
-tail logs/build_jupyter_rt-31728410.out
-```
-
-```output
-# To activate this environment, use
-#
-#     $ conda activate jupyter_rt
+#                                                               
+# To activate this environment, use                             
+#                     
+#     $ conda activate jupyter-racs-s25
 #
 # To deactivate an active environment, use
 #
 #     $ conda deactivate
 ```
 
-Looks good! This means you have an environment ready
-to activate use either in batch jobs *or* (for today's purposes)
-in the OnDemand JupyterLab app.
+You are now ready to launch JupyterLab with this environment! 
+You only need to the define *jupyter-racs-s25* once; it can be reused as many times as you would like in the future.
 
 ## Configuring the OnDemand JupyterLab App
 
@@ -150,7 +106,7 @@ From the **Interactive Apps** dropdown menu, select **Jupyter**.
 
 **Reservation:** If you don't know what that means, please leave this box blank.
 
-**Alternate Conda Environment**: To use Jupyter OnDemand with a custom environment, you need to pass in the *name* of the conda environment. For this exercise, use the `jupyter_rt` environment. To create your own conda environments, follow this tutorial.
+**Alternate Conda Environment**: To use Jupyter OnDemand with a custom environment, you need to pass in the *name* of the conda environment. For this exercise, use the `jupyter-racs-s25` environment.
 
 When you've adjusted your job settings, click the **Launch** button.
 
