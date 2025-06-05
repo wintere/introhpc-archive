@@ -4,8 +4,6 @@ Targeted towards computational researchers, these workshops introduce UNIX comma
 
 This webpage archives notes, slides, and code samples from the Introduction to High-Performance Computing workshop series. 
 
-## Spring 2025 Schedule
-* [**Why HPC, Introduction to Bash:**](https://wintere.github.io/introhpc-archive/bash/main.html) May 12th, 2pm - 4pm
 
 ## Spring 2025 Schedule
 * [**Why HPC, Introduction to Bash:**](https://wintere.github.io/introhpc-archive/bash/main.html) May 12th, 2pm - 4pm
