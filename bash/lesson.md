@@ -15,7 +15,6 @@ This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shel
 
 ## Traversing the Filesystem
 The part of the operating system responsible for managing files and directories is called the filesystem. 
-It organizes our data into files and folders which hold files or other directories. 
 
 ![A screenshot of a folder in the Finder GUI on Mac OS](../images/finder.png)*A screenshot of a folder as it appears in the Finder GUI.*
 
@@ -23,26 +22,25 @@ You have probably interacted with your device's filesystem through GUI  or graph
 
 ![A screenshot of the same folder contents from a textual ](../images/command-line.png) *A screenshot of the same folder contents as they appear from the command line.*
 
-To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal interchangeably. 
-The language to communicate with this shell application is called Bash.
+To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal. 
+The language we will use to communicate with this shell application is called Bash.
 
-Today's Bash commands are used to create, inspect, rename, and delete files and directories. To start exploring them, move to the Git Bash or Terminal application that you opened during the workshop setup.
+Today's Bash commands are used to create, manage, rename, and delete files and directories.
+A robust understanding of filesystems and systematic file management is essential 
+for high-performance computing.
+
+Navigate to the terminal you opened during [Setup](./setup.md).
 
 ## Where Are You? `pwd, cd, ls`
 
-For today's lesson, we will focus on running Bash commands *locally* on your own device. In our next lesson, we will run these commands (and a few new ones) on a *remote* cluster.
-
-### A Note on Example Commands
-{: .no_toc }
-> I have tested the commands in this workshop on a Windows computer with Git Bash installed. This means that my output paths typically begin with `/c/users/erin` rather than `/users/erin`. 
+Today, we will focus on running Bash commands *locally* on your own device. In our next lesson, we will run these commands (and a few new ones) on a *remote* cluster.
 
 ### Entering Bash Commands
-{: .no_toc }
+Bash commands can be intimidatingly terse for new programmers. You will gradually commit more commands to memory as you practice, and 
+this lessons includes a
+"cheat sheet" of covered commands.
 
-Bash commands can be intimidatingly terse for new programmers. However, if you start with the grammar, you will gradually commit more commands to memory with practice.
-
-The simplest form of Bash's grammar is a single command or program terminated by the Enter-key. Today we will focus on using built-in commands that control the underlying filesystem. 
-
+To run a Bash command, type the command *precisely*, then press the <kbd>Enter</kbd> key.
 
 ### Where You Are: `pwd`
 {: .no_toc }
@@ -53,31 +51,44 @@ Our first Bash command is `pwd`, which stands for **p**rint **w**orking **d**ire
 pwd
 ```
 
-Because terminal applications typically open to your home directory by default, the expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
+Because many terminal applications open to your home directory by default, the expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
 
 ```output
-/c/Users/Erin
+/Users/emwin
 ```
 
 This command returns the *absolute path* of the current working directory. All relative file and folder paths used as arguments must be **relative to the current working directory**.
 
+If you enter `PWD` instead, the command will not be recognized. 
+All Bash commands are case sensitive.
+
+```bash
+PWD
+```
+
+```output
+PWD: command not found
+```
+
 ### Home Directory Structure
 {: .no_toc }
 
-Each of you will have a different set of files and folders inside your home directory, which would make it difficult for interactive exercises. However, we're going to practice Bash commands from inside the `talapas-bash` folder you extracted from `talapas-bash.zip`.
+Each of you has a different set of files and folders inside your home directory, which means that you will get different
+results when running the same commands.
 
-You should have a folder `/users/home/[YOURNAME]/talapas-bash/` (Unix) or `/c/users/Home/[YOURNAME]/talapas-bash/`(Git Bash) with a set of practice subfolders and files. 
+We're going to practice Bash commands from inside the `talapas-bash` folder you extracted from `talapas-bash.zip`.
 
-*Please ask for assistance at this point if you need help moving and extracting the`talapas-bash.zip` file.*
+You should have a folder `/users/home/[YOURNAME]/talapas-bash/` (Mac OS or Linux) or `/c/users/Home/[YOURNAME]/talapas-bash/`(Git Bash) with a set of practice subfolders and files. 
+
+*Please ask for assistance now if you need help moving and extracting the`talapas-bash.zip` file.*
 
 ### Changing the Current Working Directory: `cd`
 {: .no_toc }
-Change your working directory to `talapas-bash` using the `cd` command. `cd` takes in a single **argument**, the directory to move to. You can use either absolute or relative paths, but the relative paths must be relative (as always) to the current working directory.
+Change your working directory to `talapas-bash` using the `cd` command. `cd` takes in a single **argument**, the directory to move to. You can use either absolute or relative paths, but the relative paths must be relative to the current working directory.
 
 ```bash
 cd talapas-bash
 ```
-
 
 Confirm that you are inside the `talapas-bash` directory by running the `pwd` command again.
 
@@ -88,6 +99,18 @@ pwd
 ```output
 /c/Users/Erin/talapas-bash
 ```
+
+Using `cd` *without* an argument will take you back to your home directory.
+
+```input
+cd
+```
+
+```output
+/Users/emwin
+```
+
+
 
 ### Listing "Stuff" With `ls`
 {: .no_toc }
@@ -133,7 +156,7 @@ pwd
 /Users/emwin/talapas-bash
 ```
 
-Next, we'll move to the `talapas-bash/exercise-data` directory and see what it contains.
+Let's explore this folder of examples more. Next, we'll move to the `talapas-bash/exercise-data` directory and see what it contains.
 
 ### Auto-Complete with Bash
 {: .no_toc }
