@@ -2,12 +2,12 @@
 title: Lesson
 layout: page
 permalink: /bash/lesson.html
-parent: Bash and the Command Line
+parent: Introduction to Bash
 nav_enabled: true
 published: true
 nav_order: 3
 ---
-# Day One: Bash and the Command Line
+# Day One: Introduction to Bash
 {: .no_toc }
 This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shell-novice/aio.html)* lesson of Software Carpentry.
 - TOC
@@ -24,6 +24,8 @@ You have probably interacted with your device's filesystem through GUI  or graph
 
 To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal. 
 The language we will use to communicate with this shell application is called Bash.
+To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal. 
+The language we will use to communicate with this shell application is called Bash.
 
 Today's Bash commands are used to create, manage, rename, and delete files and directories.
 A robust understanding of filesystems and systematic file management is essential 
@@ -34,12 +36,17 @@ Navigate to the terminal you opened during [Setup](./setup.md).
 ## Where Are You? `pwd, cd, ls`
 
 Today, we will focus on running Bash commands *locally* on your own device. In our next lesson, we will run these commands (and a few new ones) on a *remote* cluster.
+Today, we will focus on running Bash commands *locally* on your own device. In our next lesson, we will run these commands (and a few new ones) on a *remote* cluster.
 
 ### Entering Bash Commands
 Bash commands can be intimidatingly terse for new programmers. You will gradually commit more commands to memory as you practice, and 
 this lessons includes a
 "cheat sheet" of covered commands.
+Bash commands can be intimidatingly terse for new programmers. You will gradually commit more commands to memory as you practice, and 
+this lessons includes a
+"cheat sheet" of covered commands.
 
+To run a Bash command, type the command *precisely*, then press the <kbd>Enter</kbd> key.
 To run a Bash command, type the command *precisely*, then press the <kbd>Enter</kbd> key.
 
 ### Where You Are: `pwd`
@@ -52,12 +59,25 @@ pwd
 ```
 
 Because many terminal applications open to your home directory by default, the expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
+Because many terminal applications open to your home directory by default, the expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
 
 ```output
+/Users/emwin
 /Users/emwin
 ```
 
 This command returns the *absolute path* of the current working directory. All relative file and folder paths used as arguments must be **relative to the current working directory**.
+
+If you enter `PWD` instead, the command will not be recognized. 
+All Bash commands are case sensitive.
+
+```bash
+PWD
+```
+
+```output
+PWD: command not found
+```
 
 If you enter `PWD` instead, the command will not be recognized. 
 All Bash commands are case sensitive.
@@ -75,15 +95,22 @@ PWD: command not found
 
 Each of you has a different set of files and folders inside your home directory, which means that you will get different
 results when running the same commands.
+Each of you has a different set of files and folders inside your home directory, which means that you will get different
+results when running the same commands.
 
 We're going to practice Bash commands from inside the `talapas-bash` folder you extracted from `talapas-bash.zip`.
+We're going to practice Bash commands from inside the `talapas-bash` folder you extracted from `talapas-bash.zip`.
 
+You should have a folder `/users/home/[YOURNAME]/talapas-bash/` (Mac OS or Linux) or `/c/users/Home/[YOURNAME]/talapas-bash/`(Git Bash) with a set of practice subfolders and files. 
+
+*Please ask for assistance now if you need help moving and extracting the`talapas-bash.zip` file.*
 You should have a folder `/users/home/[YOURNAME]/talapas-bash/` (Mac OS or Linux) or `/c/users/Home/[YOURNAME]/talapas-bash/`(Git Bash) with a set of practice subfolders and files. 
 
 *Please ask for assistance now if you need help moving and extracting the`talapas-bash.zip` file.*
 
 ### Changing the Current Working Directory: `cd`
 {: .no_toc }
+Change your working directory to `talapas-bash` using the `cd` command. `cd` takes in a single **argument**, the directory to move to. You can use either absolute or relative paths, but the relative paths must be relative to the current working directory.
 Change your working directory to `talapas-bash` using the `cd` command. `cd` takes in a single **argument**, the directory to move to. You can use either absolute or relative paths, but the relative paths must be relative to the current working directory.
 
 ```bash
@@ -97,7 +124,7 @@ pwd
 ```
 
 ```output
-/c/Users/Erin/talapas-bash
+/Users/emwin/talapas-bash
 ```
 
 Using `cd` *without* an argument will take you back to your home directory.
@@ -124,24 +151,24 @@ ls
 ```
 
 ```output
-books/  exercise-data/  scripts/
+books  exercise-data  scripts
 ```
 
 
 `ls` is also the first command that we will use with options. 
 
-**Options** are letters signaled by a hyphen that are passed to commands to change the behavior of that command.
+**Options** or **flags** are letters signaled by a hyphen that are passed to commands to change the behavior of that command.
 
- Type `ls -l` with a <kbd>-</kbd> (hyphen) key. Options must come *after* the command they modify and *without space* between the hyphen and the letter representing the option.
+Type `ls -l` with a <kbd>-</kbd> (hyphen) key. Options must come *after* the command they modify and *without space* between the hyphen and the letter representing the option.
 
 ```bash
 ls -l
 ```
 
 ```output
-drwxr-xr-x 1 Erin 197121 0 Feb  3 22:48 books/
-drwxr-xr-x 1 Erin 197121 0 Feb  3 22:48 exercise-data/
-drwxr-xr-x 1 Erin 197121 0 Feb  3 22:48 scripts/
+drwxr-xr-x  5 emwin  staff  160 Feb  3  2025 books
+drwxr-xr-x  8 emwin  staff  256 Feb  3  2025 exercise-data
+drwxr-xr-x  3 emwin  staff   96 Feb  3  2025 scripts
 ```
 
 The `-l` option enables "long-listing" format. We'll come back to what each column in this new listing format means later when discussing permissions.
@@ -168,12 +195,13 @@ ls -l
 ```
 
 ```output
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 alkanes/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 animal-counts/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 creatures/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:49 mice/
--rw-r--r-- 1 Erin 197121 18 Feb  3 22:48 numbers.txt
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 writing/
+total 8
+drwxr-xr-x  9 emwin  staff  288 Feb  3  2025 alkanes
+drwxr-xr-x  3 emwin  staff   96 Feb  3  2025 animal-counts
+drwxr-xr-x  5 emwin  staff  160 Feb  3  2025 creatures
+drwxr-xr-x  7 emwin  staff  224 Feb  3  2025 mice
+-rw-r--r--  1 emwin  staff   18 Feb  3  2025 numbers.txt
+drwxr-xr-x  4 emwin  staff  128 Feb  3  2025 writing
 ```
 
 You can enable multiple options simultaneously by putting both letters after the hyphen. 
@@ -185,12 +213,13 @@ ls -lh
 ```
 
 ```output
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 alkanes/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 animal-counts/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 creatures/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:49 mice/
--rw-r--r-- 1 Erin 197121 18B Feb  3 22:48 numbers.txt
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 writing/
+total 8
+drwxr-xr-x  9 emwin  staff   288B Feb  3  2025 alkanes
+drwxr-xr-x  3 emwin  staff    96B Feb  3  2025 animal-counts
+drwxr-xr-x  5 emwin  staff   160B Feb  3  2025 creatures
+drwxr-xr-x  7 emwin  staff   224B Feb  3  2025 mice
+-rw-r--r--  1 emwin  staff    18B Feb  3  2025 numbers.txt
+drwxr-xr-x  4 emwin  staff   128B Feb  3  2025 writing
 ```
 
 Order among options does not matter when enabling multiple options. 
@@ -200,12 +229,13 @@ ls -hl
 ```
 
 ```output
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 alkanes/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 animal-counts/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 creatures/
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:49 mice/
--rw-r--r-- 1 Erin 197121 18B Feb  3 22:48 numbers.txt
-drwxr-xr-x 1 Erin 197121  0 Feb  3 22:48 writing/
+total 8
+drwxr-xr-x  9 emwin  staff   288B Feb  3  2025 alkanes
+drwxr-xr-x  3 emwin  staff    96B Feb  3  2025 animal-counts
+drwxr-xr-x  5 emwin  staff   160B Feb  3  2025 creatures
+drwxr-xr-x  7 emwin  staff   224B Feb  3  2025 mice
+-rw-r--r--  1 emwin  staff    18B Feb  3  2025 numbers.txt
+drwxr-xr-x  4 emwin  staff   128B Feb  3  2025 writing
 ```
 
 However, options *are* case-sensitive. For example, let's try `ls -F` and `ls -f`.
@@ -224,14 +254,17 @@ The `-F` **option** tells `ls` to add a marker to file and directory names to in
 
 This can be extremely informative. (**Windows:** You may already see these markings by default in Git Bash.)
 
-The `-f` option, however, tells `ls` to remove any color-coding and to show all hidden files.
+The `-f` option, however, tells `ls` to remove any color-coding and to show all hidden file and folders.
+Hidden files begin with the `.` symbol.
 
 ```bash
 ls -f
 ```
 
 ```output
-.  ..  alkanes  animal-counts  creatures  mice  numbers.txt  writing
+.		alkanes		creatures
+..		animal-counts	writing
+numbers.txt	mice
 ```
 
 If you try to use an option that is not supported, Bash commands will print an error message similar to:
@@ -241,8 +274,8 @@ ls -j
 ```
 
 ```error
-ls: invalid option -- 'j'
-Try 'ls --help' for more information.
+ls: invalid option -- j
+usage: ls [-@ABCFGHILOPRSTUWXabcdefghiklmnopqrstuvwxy1%,] [--color=when] [-D format] [file ...]
 ```
 
 ## Anatomy of a Bash Command: Command, Options, Arguments
@@ -302,7 +335,7 @@ Sure enough, if we run `pwd` after running `cd ..`, we're back in `talapas-bash`
 $ pwd
 ```
 ```output
-/c/Users/Erin/talapas-bash/
+/Users/emwin/talapas-bash
 ```
 
 The special directory `..` doesn't usually show up when we run `ls`. If we want to display it, we can add the `-a` option to `ls -F`:
@@ -312,7 +345,7 @@ ls -Fa
 ```
 
 ```output
-./  ../  books/  exercise-data/  scripts/ 
+./		../		books/		exercise-data/	scripts/
 ```
 
  It also displays another special directory `.` that points to the current working directory. It may seem redundant to have a folder refer to itself, but it will become useful as we learn more commands.
@@ -328,26 +361,25 @@ ls -Fa
 > ls ../mice
 > ```
 > ```output
-> Animals.txt  Tasks.txt  citation.txt
-> README.md    Visit.txt
+> Animals.txt	citation.txt	README.md	Tasks.txt	Visit.txt
 >```
 > 
 
 Finally, let's discuss a third special character: `~`. This is shorthand for the absolute path if your *home directory* and it works regardless of your operating system.
 
 ```bash
-cd ~
-ls
+ls ~
 ```
 
 ```output
-Applications Documents    Library      Music        Public
-Desktop      Downloads    Movies       Pictures
+Pictures
+Movies
+...
 ```
 
 #### Quiz
 {: .no_toc }
-> How would I navigate to talapas-bash using a relative path? How about an aboslute path using the `~` again?
+> How would I navigate to talapas-bash using a relative path? How about a path using `~` again?
 
 #### Answer
 {: .no_toc }
@@ -385,6 +417,20 @@ ls -F
 haiku.txt  LittleWomen.txt  thesis/
 ```
 
+Note that the `mkdir` command will silently return without prompting you if it creates the file successfully. It only prints
+a response to the terminal if it fails.
+
+For example, if you try to create a directory
+that already exists, `mkdir` will return an error.
+
+```bash
+mkdir mice
+```
+
+```output
+mkdir: mice: File exists
+```
+
 Since we've just created the `thesis` directory, there's nothing in it yet. We can check this by passing in `thesis` as an argument to `ls`.
 
 ```bash
@@ -417,7 +463,7 @@ data/  results/
 {: .no_toc }
 
 Let's change our working directory to `thesis` using `cd`,
-then run a text editor called Nano to create a file called `draft.txt`:
+then run a command-line text editor called Nano to create a file called `draft.txt`:
 
 ```bash
 cd thesis
@@ -658,7 +704,7 @@ Given that there is no way to retrieve files deleted using the shell,
 
 ### Deleting from the Command Line is Forever
 {: .no_toc }
-The Unix shell doesn't have a trash bin that we can recover deleted
+The Unix shell doesn't have a recycle bin that we can recover deleted
 files from. 
 
 On Talapas, your only hope in scenarios like this is to restore a version of the file or folder from a system backup. As researchers working in a shared computing environment, it is your responsibility not to use `rm` on project files and folders unless it is safe to remove them.
