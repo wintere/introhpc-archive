@@ -3,7 +3,7 @@ title: Setup
 layout: page
 permalink: /bash/setup.html
 nav_enabled: true
-parent: Bash and the Command Line
+parent: Introduction to Bash
 nav_order: 1
 ---
 # Setup
