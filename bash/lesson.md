@@ -1009,6 +1009,161 @@ holding down the control key (<kbd>Ctrl</kbd>) and pressing the letter
 
 <kbd>Ctrl</kbd>\+<kbd>C</kbd> can also be used to exit running programs, so this is an essential skill for interacting with the command line.
 
+### Warning: Redirecting to the same file
+{: .no_toc }
+
+It's a very bad idea to try redirecting
+the output of a command that operates on a file
+to the same file. For example:
+
+```bash
+sort -n lengths.txt > lengths.txt
+```
+
+Doing something like this may give you
+incorrect results and/or delete the contents of `lengths.txt`. *Do not actually run this command.*
+
+
+### Peeking at the Bottom with `tail`
+{: .no_toc }
+
+The last `head` command, which prints the first few lines of a text file. 
+By default it prints the first 10, but we can use the -n flag followed by a number to indicate how many lines we want to print.
+```bash
+head -n 1 sorted-lengths.txt
+```
+
+```out
+9 methane.pdb
+```
+
+`tail` is similar, but prints it lines from the end of a file instead.
+
+If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and the total lengths of all the `.pdb` files instead.
+
+```bash
+tail -n 2 sorted-lengths.txt
+```
+
+```output
+  30 octane.pdb
+ 107 total
+```
+
+## Accumulating Text: `>>` and `echo`
+The most trivial of the commands that print to the terminal is `echo` which returns the strings or words you pass it as input back to you as output.
+
+```bash
+echo "Good afternoon"
+```
+
+```output
+Good afternoon
+```
+
+```bash
+echo "Good afternoon" > greeting.txt
+```
+
+```bash
+cat greeting.txt
+```
+
+```output
+Good afternoon
+```
+
+We can append to an existing file by using `>>`:
+
+```bash
+echo 'Backup your files' >> greeting.txt
+cat greeting.txt
+```
+```output
+Good afternoon
+Backup your files
+```
+
+```bash
+echo 'Talapas doesn't count as backup' >> greeting.txt
+cat greeting.txt
+```
+
+```output
+Good afternoon
+Backup your files
+Talapas doesn't count as backup
+```
+
+#### Quiz
+{: .no_toc }
+Which would be appropriate for a maintaining a log file that is updated with one line per day representing the
+status of scientific pipeline: `>` or `>>`?
+
+#### Answer
+{: .no_toc }
+You want to concatenate with `>>` because `>` would overwrite the previous day's output. 
+
+## Pipelines: The Magic of `|`
+
+In our example of finding the file with the fewest lines,
+we used intermediate files `lengths.txt` and `sorted-lengths.txt` to store output.
+This is a confusing way to work because
+even once you understand what `wc`, `sort`, and `head` do,
+those intermediate files make it hard to follow.
+A special character `|` can allow us to the connect Bash commands together.
+
+```bash
+sort -n lengths.txt | head -n 1
+```
+
+```output
+  9  methane.pdb
+```
+
+The vertical bar, `|`, between the two commands is called a **pipe**.
+It tells the shell that we want to use
+the output of the command on the left
+as the input to the command on the right.
+
+
+This removes the need for the `sorted-lengths.txt` file.
+
+Nothing prevents us from chaining pipes consecutively.
+We can for example send the output of `wc` directly to `sort`,
+and then send the resulting output to `head`.
+This removes the need for any intermediate files.
+
+We'll start by using a pipe to send the output of `wc` to `sort`:
+
+```bash
+wc -l *.pdb | sort -n
+```
+
+```output
+   9 methane.pdb
+  12 ethane.pdb
+  15 propane.pdb
+  20 cubane.pdb
+  21 pentane.pdb
+  30 octane.pdb
+ 107 total
+```
+
+We can then send that output through another pipe, to `head`, so that the full pipeline becomes:
+
+```bash
+wc -l *.pdb | sort -n | head -n 1
+```
+
+```output
+9  methane.pdb
+```
+
+The redirection and pipes used in the last few commands are illustrated below:
+
+![pipes filters](../images/pipe-filters.JPG)
+
 ## Getting Help with Linux Commands: `man` and `help`
 {: .no_toc }
 Commands like `ls` have so many options that even the most experienced users wouldn't have them all memorized. As you encounter new commands, use the [GNU manual](https://www.gnu.org/software/coreutils/manual/html_node/index.html) and references like [StackOverflow](https://stackoverflow.com/) to guide you in configuring their options and options.

@@ -88,12 +88,12 @@ To leave your SSH key without a passphrase, type **Enter** twice more.
 At this point, all of you should be ready to connect to Talapas. Type the following command into your terminal application.
 
 ```bash
-ssh [yourDuckID]@login1.talapas.uoregon.edu
+ssh [yourDuckID]@login2.talapas.uoregon.edu
 ```
 If this is your first time connecting to Talapas through SSH, you will be prompted with a long, unwieldy message that ends with this line.
 
 ```ouput
-The authenticity of host 'login1.talapas.uoregon.edu (128.223.192.241)' can't be established.
+The authenticity of host 'login2.talapas.uoregon.edu (128.223.192.241)' can't be established.
 ED25519 key fingerprint is ...
 This key is not known by any other names
 Are you sure you want to continue connecting (yes/no/[fingerprint])?
@@ -102,9 +102,9 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 Type `yes` (lowercase) and press **Enter** to dismiss the message. You will not prompted with it again unless you change devices or create a new SSH key.
 
 In the future, feel free to use any of the 4 login nodes or to choose the load balancer at `login.talapas.uoregon.edu`. For today, let's
-all log on to the same node: `login1.talapas.uoregon.edu`.
+all log on to the same node: `login2.talapas.uoregon.edu`.
 
-![example Talapas welcome message](../images/talapas-welcome.JPG) *An example Talapas welcome message*
+![example Talapas welcome message](../images/talapas-welcome.png) *An example Talapas welcome message*
 
 Congratulations, you're now on Talapas.
 
@@ -120,7 +120,7 @@ To reduce the number of Duo 2FA prompts, you can take the following steps:
 3. Add your SSH public key to the `~/.ssh/authorized_keys` file on Talapas.
 
 ```bash
-ssh-copy-id -i ~/.ssh/id_ed25519.pub [yourDuckID]@login1.talapas.uoregon.edu
+ssh-copy-id -i ~/.ssh/id_ed25519.pub [yourDuckID]@login2.talapas.uoregon.edu
 ```
 
 ```output
@@ -134,7 +134,7 @@ Number of key(s) added: 1
 Next, check that your key has been added to the `authorized_keys` file on Talapas.
 
 ```bash
-ssh [yourDuckID]@login1.talapas.uoregon.edu
+ssh [yourDuckID]@login2.talapas.uoregon.edu
 cat ~/.ssh/authorized_keys
 ```
 You should see something like this if your key has been successfully added.

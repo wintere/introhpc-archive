@@ -2,7 +2,8 @@
 title: Exit Quiz Key
 layout: page
 permalink: /tutorials/exit-key.html
-nav_enabled: false
+nav_enabled: true
+parent: Tutorials and Resources
 ---
 
 ## Introduction to Bash - Oct. 14th

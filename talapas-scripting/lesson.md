@@ -130,11 +130,11 @@ Because software **cannot manipulate open, write or execute files without permis
 Though many of you come from different labs, we all share a *racs_training* PIRG. That means, everyone should have access to the shared `racs_training` folder located in `/projects/racs_training`. Let's examine the permissions of a certain file in the `racs_training` folder.
 
 ```bash
-ls -lh /projects/racs_training/intro-hpc-s25/emw/greeting.txt
+ls -lh /projects/racs_training/intro-hpc-f25/bash-on-talapas/greeting.txt
 ```
 
 ```output
--rwxr--r--. 1 emwin is.racs.pirg.racs_training 29 May 13 16:06 /projects/racs_training/intro-hpc-s25/emw/greeting.txt
+-r-xr-xr--. 1 emwin is.racs.pirg.racs_training 29 Oct 15 11:33 /projects/racs_training/intro-hpc-f25/bash-on-talapas/greeting.txt
 ```
 
 It's time to unpack results from the `-l` or long listing flag. Let's see if we can understand **what each field of a given row represents**,
@@ -169,12 +169,17 @@ Some labs have more complicated permissions hiearchies implemented in their ACL 
 in the Talapas-specific lesson.
 
 We should all be able to `cat` this file to the terminal.
+
+To avoid typing the long absolute path again, remember to use the 
+up arrow key to traverse through your previous commands, and the left arrow
+to change `ls` to `cat`.
+
 ```bash
-cat /projects/racs_training/intro-hpc-s25/emw/greeting.txt
+cat /projects/racs_training/intro-hpc-f25/bash-on-talapas/greeting.txt
 ```
 
 ```output
-Is this the first file you've looked at on Talapas?
+Good afternoon! You'll need to make a copy of this file to modify it.
 ```
 
 We can't run the `ls` or `cat` command on files and folders we don't have permission to read. For example, I'll get a permissions error if I try to list the contents of someone else's home directory.
@@ -199,6 +204,7 @@ On websites like StackOverflow, you may advised to use the command `chmod 777` o
 Test this theory on an empty file in your home directory.
 
 ```bash
+cd ~
 touch the-universal-file.txt
 chmod 777
 ```
@@ -212,11 +218,12 @@ ls -lh the-universal-file.txt
 ```
 
 ```output
--rwxrwxrwx. 1 emwin uoregon 0 Feb  5 11:21 the-universal-file.txt
+-rwxrwxrwx. 1 emwin uoregon 0 Oct 15 13:19 the-universal-file.txt
 ```
 
 This is a bad idea because it grants read, write, and execute permissions to **all** users for the file. 
-In the majority of cases, your problems can be solved by giving **group** read access using  to files and execute access on folders for your colleagues traversal. 
+In the majority of cases, your problems can be solved by giving **group** read access using to files and execute access on folders for your colleagues traversal, namely your PIRG's `/projects/pirg_name` 
+folder.
 
 
 ## Transferring Files to and from Talapas with `scp`
@@ -237,7 +244,17 @@ logout
 Connection to login2.talapas.uoregon.edu closed.
 ```
 
-You should be back on your local machine. Use `pwd` to check that you are in your home directory and `ls talapas-bash.zip` to make sure you have today's zip folder ready.
+Confirm your terminal is connected to your laptop with the hostname command.
+
+```bash
+hostname
+```
+
+```output
+UO-2012173
+```
+
+Use `pwd` to check that you are in your home directory and `ls talapas-bash.zip` to make sure you have today's zip folder ready.
 
 ```bash
 pwd
@@ -248,8 +265,7 @@ ls talapas-bash.zip
 talapas-bash.zip
 ```
 
-Remember the `cp` command? With SSH access, you can use the extremely convenient `scp` or "secure copy" command to copy files/folders to 
-and from Talapas. 
+Remember the `cp` command? With SSH access, you can use the `scp` or "secure copy" command to copy files/folders to and from Talapas. 
 
 Just like the `cp` command, the arguments for `scp` are indicated in [source] [destination] order. 
 
@@ -265,13 +281,13 @@ talapas-bash.zip                              100% 7187KB   5.4MB/s   00:01
 
 #### Quiz
 {: .no_toc }
-How would I copy the `/projects/racs_training/intro-hpc-s25/emw/greeting.txt` file to my home directory on my laptop using `scp`? (Use auto-complete on this lengthy path.)
+How would I copy the `/projects/racs_training/intro-hpc-f25/bash-on-talapas/greeting.txt` file to my home directory on my laptop using `scp`? (Use auto-complete on this lengthy path.)
 
 **Hint**: Remember what the `.` character means?
 #### Answer
 {: .no_toc }
 ```bash
-scp [yourDuckID]@login2.talapas.uoregon.edu:/projects/racs_training/intro-hpc-s25/emw/greeting.txt .
+scp [yourDuckID]@login2.talapas.uoregon.edu:/projects/racs_training/intro-hpc-f25/bash-on-talapas/greeting.txt .
 ```
 
 ```output
@@ -284,7 +300,7 @@ cat greeting.txt
 ```
 
 ```output
-First Talapas file transfer?
+Good afternoon! You'll need to make a copy of this file to modify it.
 ```
 
 Let's get back to learning Bash. Use the arrow keys to traverse your command history and run the `ssh` command again.
@@ -322,216 +338,23 @@ The contents of the folder should be familiar to you at this point.
 
 ```bash
 cd talapas-bash
-ls
+ls -F
 ```
 
 ```output
 books/  exercise-data/  scripts/
 ```
 
-Let's use auto-complete with `tab` to navigate to the `exercise-data/alkanes` directory.
+Let's use auto-complete with `tab` to navigate to the `exercise-data` directory.
 
 ```bash
-cd exercise-data/alkanes
+cd exercise-data
 ls -F
 ```
 
 ```output
-cubane.pdb  explosive/   octane.pdb   propane.pdb
-ethane.pdb  methane.pdb  pentane.pdb
+alkanes/  animal-counts/  creatures/  mice/  numbers.txt  writing/
 ```
-### Refresher: Sorting and Pipes
-{: .no_toc }
-
-In our last session, we used the `*` symbol and the `wc` to generate the number of lines in each of the `.pdb` files in this folder.
-```bash
-wc -l *.pdb 
-```
-
-```output
-20  cubane.pdb
-12  ethane.pdb
-9  methane.pdb
-30  octane.pdb
-21  pentane.pdb
-15  propane.pdb
-107  total
-```
-
-We then *redirected* the output of this command to a text file named lengths using the `>` or redirect command. The directionality is important here.
-
-```bash
-wc -l *.pdb > lengths.txt
-```
-
-Using the `sort -n` command, we sorted the lines of the lengths.txt file numerically, affectively putting the lines counts for each `.pdb` file in ascending order.
-
-```bash
-sort -n lengths.txt
-```
-
-We wrote the output of this command to `sorted-lengths.txt`.
-
-```bash
-sort -n lengths.txt > sorted-lengths.txt
-```
-
-
-### Warning: Redirecting to the same file
-{: .no_toc }
-
-It's a very bad idea to try redirecting
-the output of a command that operates on a file
-to the same file. For example:
-
-```bash
-sort -n lengths.txt > lengths.txt
-```
-
-Doing something like this may give you
-incorrect results and/or delete the contents of `lengths.txt`. *Do not actually run this command.*
-
-
-### Peeking at the Bottom with `tail`
-{: .no_toc }
-
-The last `head` command, which prints the first few lines of a text file. 
-By default it prints the first 10, but we can use the -n flag followed by a number to indicate how many lines we want to print.
-```bash
-head -n 1 sorted-lengths.txt
-```
-
-```out
-9 methane.pdb
-```
-
-`tail` is similar, but prints it lines from the end of a file instead.
-
-If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and the total lengths of all the `.pdb` files instead.
-
-```bash
-tail -n 2 sorted-lengths.txt
-```
-
-```output
-  30 octane.pdb
- 107 total
-```
-
-## Accumulating Text: `>>` and `echo`
-The most trivial of the commands that print to the terminal is `echo` which returns the strings or words you pass it as input back to you as output.
-
-```bash
-echo "Good afternoon"
-```
-
-```output
-Good afternoon
-```
-
-```bash
-echo "Good afternoon" > greeting.txt
-```
-
-```bash
-cat greeting.txt
-```
-
-```output
-Good afternoon
-```
-
-We can append to an existing file by using `>>`:
-
-```bash
-echo 'Backup your files' >> greeting.txt
-cat greeting.txt
-```
-```output
-Good afternoon
-Backup your files
-```
-
-```bash
-echo 'Talapas doesn't count as backup' >> greeting.txt
-cat greeting.txt
-```
-
-```output
-Good afternoon
-Backup your files
-Talapas doesn't count as backup
-```
-
-#### Quiz
-{: .no_toc }
-Which would be appropriate for a maintaining a log file that is updated with one line per day representing the
-status of scientific pipeline: `>` or `>>`?
-
-#### Answer
-{: .no_toc }
-You want to concatenate with `>>` because `>` would overwrite the previous day's output. 
-
-## Pipelines: The Magic of `|`
-
-In our example of finding the file with the fewest lines,
-we used intermediate files `lengths.txt` and `sorted-lengths.txt` to store output.
-This is a confusing way to work because
-even once you understand what `wc`, `sort`, and `head` do,
-those intermediate files make it hard to follow.
-A special character `|` can allow us to the connect Bash commands together.
-
-```bash
-sort -n lengths.txt | head -n 1
-```
-
-```output
-  9  methane.pdb
-```
-
-The vertical bar, `|`, between the two commands is called a **pipe**.
-It tells the shell that we want to use
-the output of the command on the left
-as the input to the command on the right.
-
-
-This removes the need for the `sorted-lengths.txt` file.
-
-Nothing prevents us from chaining pipes consecutively.
-We can for example send the output of `wc` directly to `sort`,
-and then send the resulting output to `head`.
-This removes the need for any intermediate files.
-
-We'll start by using a pipe to send the output of `wc` to `sort`:
-
-```bash
-wc -l *.pdb | sort -n
-```
-
-```output
-   9 methane.pdb
-  12 ethane.pdb
-  15 propane.pdb
-  20 cubane.pdb
-  21 pentane.pdb
-  30 octane.pdb
- 107 total
-```
-
-We can then send that output through another pipe, to `head`, so that the full pipeline becomes:
-
-```bash
-wc -l *.pdb | sort -n | head -n 1
-```
-
-```output
-   9  methane.pdb
-```
-
-The redirection and pipes used in the last few commands are illustrated below:
-
-![pipes filters](../images/pipe-filters.JPG)
-
 
 ### Putting it Together: Pipes and Filters
 {: .no_toc }
@@ -550,7 +373,7 @@ Let's put some of these skills into practice.
 Move into the `mice` directory and take a look at the files there.
 
 ```bash
-cd ../mice
+cd mice
 ls
 ```
 
@@ -820,7 +643,6 @@ nano hello.sh`
 ```bash
 #!/bin/bash
 # This is a comment, which will be ignored
-# The line below prints "Hello World" to standard out
 echo "Hello World"
 ```
 As always, use <kbd>Ctrl</kbd>+<kbd>O</kbd> then **Enter** to
@@ -834,8 +656,12 @@ Now, if we try to run it like any old command, we'll get an error.
 hello.sh
 ```
 
-You could choose to execute it using `source hello.sh`, which is much like running `python3 myfile.py` or `Rscript myscript.R` on Python and R scripts respectively. 
-The `source` command tells the shell to execute each line of a text file as a sequence of commands.
+```output
+-bash: hello.sh: command not found
+```
+
+The `source` command tells the 
+current shell to execute each line of a text file as a sequence of commands.
 
 ```bash
 source hello.sh
@@ -844,8 +670,7 @@ source hello.sh
 ```output
 Hello World
 ```
-
-Alternatively, we can prefix `./` to the filepath of the script to execute it, as long as it has execute permissions. 
+You could choose to execute it using `./hello.sh`, which is much like running `python3 myfile.py` or `Rscript myscript.R` on Python and R scripts respectively. This works as long as we have execute permissions on the file. 
 
 ```bash
 ls -lh hello.sh
@@ -1106,19 +931,20 @@ Similar to wildcards and tab completion, using loops also reduces the
 amount of typing required (and hence reduces the number of typing mistakes).
 
 Let's copy a certain folder from the `racs_training` folder to your home directory.
-Use the tab auto-complete feature to help you!
+You will need to use the recursive flag `-r` to copy the *contents* of the folder.
+Use the tab auto-complete feature rather than try to memorize the path.
 
 ```bash
-cp -r /projects/racs_training/intro-hpc-s25/emw .
-cd emw
+cp -r /projects/racs_training/intro-hpc-f25/bash-on-talapas .
+cd bash-on-talapas
 ```
 
-If you look inside your copy of the `emw` directory, you'll see a script called `a-slow-script.sh`.
+If you look inside your copy of the `bash-on-talapas` directory, you'll see a script called `loop.sh`.
 
 Use `cat` to print it to the terminal.
 
 ```bash 
-cat a-slow-script.sh
+cat loop.sh
 ```
 
 ```output
@@ -1220,11 +1046,11 @@ distributed on several CPU-cores simultaneously.
 
 You will learn more about Slurm in detail next week. Before we go, I'd like to demonstrate the role Bash plays in distributing work among compute nodes in the cluster.
 
-Navigate inside the `bash-where-who` directory and inspect `a-little-script.sh`.
+Navigate inside the `slurm` directory and inspect `who.sh`.
 
 ```bash
-cd bash-where-who/
-cat a-little-script.sh
+cd slurm
+cat who.sh
 ```
 
 ```output
@@ -1239,8 +1065,8 @@ echo 'Done.'
 Mark the script as executable *by our group* and run it.
 
 ```bash
-chmod g+x a-little-script.sh
-./a-little-script.sh
+chmod g+x who.sh
+./who.sh
 ```
 
 ```output
@@ -1253,24 +1079,20 @@ Done.
 As we would expect, this script runs on the login node (where we shouldn't do significant work) and writes its output to the terminal.
 When we run batch jobs on Talapas, we want work to be done *on the compute nodes* of the cluster and for their textual output, if any, to be written to a log file to be inspected later.
 
-Move up a directory using `cd`.
+Now, let's concatenate `slurm-who.sbatch` to the terminal and dissect it piece by piece.
+It looks very similar to `who.sh`, but it has special comments at the top that
+distinguish it as a script intended for the Slurm scheduler.
 
 ```bash
-cd ..
-```
-
-Now, let's concatenate `slurm-greeting.sh` to the terminal and dissect it piece by piece.
-
-```bash
-cat slurm-greeting.sbatch
+cat slurm-who.sbatch
 ```
 
 ```bash
 #!/bin/bash
 #SBATCH --account=racs_training
 #SBATCH --partition=compute
-#SBATCH --output=first-log.txt
-#SBATCH --error=first-error.txt
+#SBATCH --output=who-out.txt
+#SBATCH --error=who-error.txt
 #SBATCH --time=0-00:05:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=500M
@@ -1281,7 +1103,8 @@ echo "This script is running on" $HOSTNAME
 echo 'Done.'
 ```
 
-At the top, it has the `!/bin/bash` sequence to indicate to Slurm that this is a Bash script. Slurm will not run files that are not Bash scripts.
+At the top, it has the `!/bin/bash` sequence to indicate to Slurm that this is a Bash script. 
+Slurm will not run files that are not Bash scripts.
 
 What follows are sequences of special comments that tell Slurm *how* to run this script. 
 These are parameters that are passed to Slurm that will decide when, where, and with how many resources, your job is run.
@@ -1296,12 +1119,12 @@ These are parameters that are passed to Slurm that will decide when, where, and 
 * **error** the file location where the output from **stderror** should be logged. will generate an empty file on job with no errors.
 
 
-Let's try running this file two ways: as a Bash script and as input to Slurm.
+Let's try running this file two ways: as a Bash script executed in the shell and as input to Slurm.
 First, give yourself e**x**ecute permissions using `chmod`. Then, run the file using `./slurm-greeting.sbatch`.
 
 ```bash
-chmod +x slurm-greeting.sbatch
-./slurm-greeting.sbatch
+chmod +x slurm-who.sbatch
+./slurm-who.sbatch
 ```
 
 ```output
@@ -1316,14 +1139,14 @@ But we don't want it to run on the login node. Let's pass it to SLURM using `sba
 After you've carefully configured the job, queueing it is easy.
 
 ```bash
-sbatch slurm-greeting.sbatch
+sbatch slurm-who.sbatch
 ```
 
 ```output
-Submitted batch job [NUMBER]
+Submitted batch job 39136076
 ```
 
-Now that your job is queued, check for its presence and status using `squeue`.
+Now that your job is queued, check its status using the `squeue` command.
 
 Replace the following command with your DuckID.
 
@@ -1334,7 +1157,7 @@ squeue -u [MYDUCKID]
 Or, use this shorthand.
 
 ```bash
-squeue -u $(whoami)
+squeue --me
 ```
 
 If you see an empty queue, your job has already completed. 
@@ -1348,35 +1171,37 @@ sacct
 ```output
 JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
 ------------ ---------- ---------- ---------- ---------- ---------- -------- 
-31458049          first    compute racs_trai+          1  COMPLETED      0:0 
-31458049.ba+      batch            racs_trai+          1  COMPLETED      0:0 
-31458049.ex+     extern            racs_trai+          1  COMPLETED      0:0 
+39136076     slurm-who+    compute racs_trai+          1  COMPLETED      0:0 
+39136076.ba+      batch            racs_trai+          1  COMPLETED      0:0 
+39136076.ex+     extern            racs_trai+          1  COMPLETED      0:0
 ```
 
-Now that the job has terminated, let's look at the results. This job doesn't manipulate files in and of itself, it only writes to standard out.
+Now that the job has terminated, let's look at the results. 
 
 ```bash
-cat first-log.txt
+cat who-out.txt
 ```
 
 ```output
-Running on n0135
-Hello world!
+Good afternoon!
+This script is running as emwin
+This script is running on n0135
+Done.
 ```
 
 After being queued with `sbatch`, the job ran on `n0135`, a **compute node**.
 
-Because the job didn't err out, the `first-errortxt` file should be *empty*.
+Because the job didn't err out, the `who-err.txt` file should be *empty*.
 
 ```bash
-cat first-error.txt
+cat who-err.txt
 ```
 
 ```output
 ```
 
 This is a sneak peek of Slurm to demonstrate the role of Bash scripting on Talapas.
-We will dive deeper into this topic next week!
+We will dive deeper into this topic next week. 
 
 ## Today's Bash Command List
 

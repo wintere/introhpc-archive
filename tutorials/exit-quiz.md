@@ -2,7 +2,8 @@
 title: Exit Quiz
 layout: page
 permalink: /tutorials/exit-quiz.html
-nav_enabled: false
+nav_enabled: true
+parent: Tutorials and Resources
 ---
 
 # Bash Self-Test for Talapas
