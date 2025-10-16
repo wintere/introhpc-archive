@@ -795,15 +795,15 @@ To reference additional arguments, use `$2`, `$3` and so on.
 
 ## Variables in Bash
 
-The shell is just a program, and like other programs, it has variables.
+The shell is a program, and like other programs, it has variables.
 Those variables control its execution,
 so by changing their values
 you can change how the shell and other programs behave.
 
 Every variable has a name.
-By convention, variables that are always present (constants) are given upper-case names.
+By convention, Bash constants are given upper-case names.
 
-Let's show the value of the variable `HOME`, or the path of *your* home directory:
+Let's show the value of the environment variable `HOME`, or the path of *your* home directory:
 
 ```bash
 echo HOME
@@ -834,7 +834,7 @@ echo $HOSTNAME
 login2.talapas.uoregon.edu
 ```
 
-To set our own variables for a given terminal session, we can use the following syntax:
+To set our own variables for a terminal session, we can use the following syntax:
 
 ```bash
 FAMILY_PET='Scout'
@@ -845,84 +845,9 @@ echo $FAMILY_PET
 Scout
 ```
 
-## Stdout, Stderr
-
-Thus far, you have learned to run Bash commands in which output is either directed to
-stdout, the terminal, or [redirected](https://www.gnu.org/software/bash/manual/html_node/Redirections.html?ref=vegastack.com) to a file.
-
-We will now differentiate between standard out (stdout) and (stderr).
-
-For any given command or program, output can be written to stdout or stderr. 
-Stderr, by default, is a separate stream from stdout, even though it prints to the terminal by default too.
-
-Let's navigate back to the `talapas-bash` directory and do a quick `ls`.
-
-```bash
-cd
-ls
-```
-
-```output
-books		scripts
-exercise-data
-```
-
-This command runs without creating errors; it prints a list of folders to stdout.
-But what if try to inspect the contents of a folder that doesn't exist?
-
-```bash
-ls FAKEDIR
-```
-
-```output
-ls: FAKEDIR: No such file or directory
-```
-
-If we try to redirect the output of this command, something strange happens: the error message
-still prints to the terminal and `log.txt` remains empty.
-
-```bash
-ls FAKEDIR > log.txt
-```
-
-```output
-ls: FAKEDIR: No such file or directory
-```
-
-To redirect stderr to file, we must prefix `>` with `2>` to indicate that 
-we want to redirect stderr. 
-
-```bash
-ls FAKEDIR 2> error.txt
-cat error.txt
-```
-
-```output
-ls: FAKEDIR: No such file or directory
-```
-
-A command that does *not* print to  stderr will returns it output through
-stdout as usual.
-
-```bash
-echo "This won't error out" 2> error.txt
-```
-
-```output
-This won't error out
-```
-
-Because nothing was written out to stderr, `error.txt` is an empty file.
-```bash
-cat error.txt
-```
-
-```output
-```
-
-The difference between stdout and
-stderror is important because Slurm jobs write output and error logs 
-to separate files.
+Unlike environment variables, which remain consistent
+between terminal sessions, the FAMILY_PET variable
+will disappear after this Bash session ends.
 
 ## Loops: Easy as `for`, `do`, `done`
 **Loops** are a programming construct which allow us to repeat a command or set of commands
@@ -1011,18 +936,18 @@ ls -lh
 In this case, I do *not* have permission to execute this file. I need to add **execute** permissions.
 
 ```bash
-chmod u+x a-slow-script
+chmod u+x loop.sh
 ls -lh
 ```
 
 ```output
--r-xr-xr-x. 1 emwin uoregon  159 May 14 08:38 a-slow-script.sh
+-r-xr-xr-x. 1 emwin uoregon  159 May 14 08:38 loop.sh
 ```
 
 Now, I can run the script.
 
 ```bash
-./a-slow-script.sh
+./loop.sh
 ```
 
 
@@ -1041,11 +966,182 @@ Cancel the script using **Ctrl+C** before it prints all fifteen numbers.
 Loops are a crucial control flow construct among all programming languages.
 Looking ahead, one way of *parallelizing* code written in *serial form* is to identify independent, non-sequential operations
 represented by a loop and to convert them into separate or threads processes that can be 
-distributed on several CPU-cores simultaneously.
+distributed among parallel jobs or threads.
+
+## Stdout, Stderr
+
+Thus far, you have learned to run Bash commands in which output is either directed to
+stdout, the terminal, or [redirected](https://www.gnu.org/software/bash/manual/html_node/Redirections.html?ref=vegastack.com) to a file.
+
+We will now differentiate between standard out (stdout) and (stderr).
+
+For any given command or program, output can be written to stdout or stderr. 
+Stderr, by default, is a separate stream from stdout, even though it prints to the terminal by default too.
+
+Let's navigate back to the `talapas-bash` directory and do a quick `ls`.
+
+```bash
+cd
+ls
+```
+
+```output
+books		scripts
+exercise-data
+```
+
+This command runs without creating errors; it prints a list of folders to stdout.
+But what if try to inspect the contents of a folder that doesn't exist?
+
+```bash
+ls FAKEDIR
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+If we try to redirect the output of this command, something strange happens: the error message
+still prints to the terminal and `log.txt` remains empty.
+
+```bash
+ls FAKEDIR > log.txt
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+To redirect stderr to file, we must prefix `>` with `2>` to indicate that 
+we want to redirect stderr. 
+
+```bash
+ls FAKEDIR 2> error.txt
+cat error.txt
+```
+
+```output
+ls: FAKEDIR: No such file or directory
+```
+
+A command that does *not* print to  stderr will returns it output through
+stdout as usual.
+
+```bash
+echo "This won't error out" 2> error.txt
+```
+
+```output
+This won't error out
+```
+
+Because nothing was written out to stderr, `error.txt` is an empty file.
+```bash
+cat error.txt
+```
+
+```output
+```
+
+The difference between stdout and
+stderror is important because Slurm jobs write output and error logs 
+to separate files.
+
+
+
+## The PATH Variable
+
+Do you know why the shell executes scripts given the form `./loop.sh`
+or `bash loop.sh` but fails to recognize `loop.sh`?
+
+Let's start by inspecting the error message.
+
+```bash
+loop.sh
+```
+
+```output
+-bash: loop.sh: command not found
+```
+
+In the *grammar* of Bash, the first word is assumed to be an executable:
+either or a program built into the shell (`ls`, `cd`) or
+a program on the user's PATH variable.
+
+You can peek at your PATH on Talapas using `echo $PATH`, just like you would 
+any other environment variable.
+
+```bash
+echo $PATH
+```
+
+```output
+/home/emwin/.local/bin:/home/emwin/bin:/gpfs/t2/slurm/apps/current/bin:/gpfs/t2/slurm/apps/current/sbin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/dell/srvadmin/sbin
+```
+
+When you type a command like `loop.sh`, the shell searches the directories
+listed in the PATH variable for binaries of that name, starting from the first directory and searching the directories in
+order. Hiearchy matters!
+
+Because the directory `/home/emwin/intro-hpc-f25/bash-on-talapas` is not on my PATH,
+the shell fails to find `loop.sh` in any of these folders.
+
+If you would like to see where a binary on your PATH
+is located in the filesystem, you can use the `which` command.
+Let's test `which` on the `htop` command!
+
+The `htop` command is a process viewer. We can use it to see
+running processes and their
+resource usage. Given that we're on a login node, the answer should be that we're doing very little. 
+
+I'm going to pass
+in my DuckID to the `-u` or `user` argument so that
+I see only my processes.
+
+```bash
+htop -u emwin
+```
+
+Now, let's inspect the file location of the
+`htop` command.
+
+```bash
+which htop
+```
+
+```output
+/usr/bin/htop
+```
+
+This tells us that's it's in the `/usr/bin` folder.
+
+#### Quiz
+{: .no_toc }
+Using `echo` and piping, how could I confirm that
+`/usr/bin` is on my PATH?
+
+#### Answer
+{: .no_toc }
+This could be done in several ways, but the simplest
+is to redirect the PATH variable to the input of `grep`.
+```bash
+echo $PATH | grep "/usr/bin"
+```
+
+### Avoid Modifying your PATH on Talapas
+
+You may have modified your PATH variable on your personal laptop without having realized it.
+Many command-line applications (like Python or Docker) modify your PATH during the installation process.
+
+**On Talapas, you should not modify your PATH manually, nor should you attempt to install
+any software. Directories (and the binaries stored there) are loaded onto your PATH through [lmod](https://lmod.readthedocs.io/en/latest/).**
+
+Future lessons will discuss the nuances of lmod.
+
 
 ## Our First Slurm Job
 
-You will learn more about Slurm in detail next week. Before we go, I'd like to demonstrate the role Bash plays in distributing work among compute nodes in the cluster.
+Before we go, I'd like to demonstrate the role Bash plays in distributing work among compute nodes in the cluster.
 
 Navigate inside the `slurm` directory and inspect `who.sh`.
 
