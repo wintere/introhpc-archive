@@ -920,8 +920,9 @@ cat error.txt
 ```output
 ```
 
-The notion of separate output and err streams becomes relevant on Talapas because Slurm allows you to write error logs and output logs 
-to separate files, which makes debugging jobs that produce large amounts of textual output easier.
+The difference between stdout and
+stderror is important because Slurm jobs write output and error logs 
+to separate files.
 
 ## Loops: Easy as `for`, `do`, `done`
 **Loops** are a programming construct which allow us to repeat a command or set of commands
@@ -1010,7 +1011,7 @@ ls -lh
 In this case, I do *not* have permission to execute this file. I need to add **execute** permissions.
 
 ```bash
-chmod +x a-slow-script
+chmod u+x a-slow-script
 ls -lh
 ```
 
@@ -1062,10 +1063,10 @@ echo "This script is running on" $HOSTNAME
 echo 'Done.'
 ```
 
-Mark the script as executable *by our group* and run it.
+Mark the script as executable and run it.
 
 ```bash
-chmod g+x who.sh
+chmod u+x who.sh
 ./who.sh
 ```
 
