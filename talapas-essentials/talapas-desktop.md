@@ -28,7 +28,7 @@ Just like any Talapas job, the more resources you ask for, the longer it will ta
 
 **CPU Cores:** You must ask for at least `1`. Only code or software packages that are configured to do so can take advantage of multiple cores.
 
-**Total memory:** We typically recommend 4GB per CPU core. You can ask for up to 100GB.
+**Total memory:** We typically recommend 4GB per CPU core. You can ask for up to 192GB on `interactive` and up to 48GB on `interactivegpu`. 
 
 **GPU enabled:** Only check if you require a GPU. To use a GPU, this box must be checked **AND** you must run on the `interactivegpu` partition.
 
@@ -47,7 +47,7 @@ Click the **Launch Talapas Desktop** button to open the application.
 
 ## Running Code on Talapas Desktop
 
-Talapas Desktop sessions are held on **compute** nodes. That means you can open the **Mate Terminal application in the top left corner,
+Talapas Desktop sessions are held on **compute** nodes. That means you can open the **Mate Terminal**rsdum application in the top left corner,
 load desired modules, and run scripts against data on GPFS *without* interacting with Slurm because you're already on the *interactive* partition.
 ![example session](../images/talapas-desktop-work.JPG)
 
@@ -74,7 +74,8 @@ Want to run RStudio on Talapas? Perform the following steps:
 
 ## Cleaning Up
 
-Your Talapas Desktop job will continue to run until the requested time limit elapses or until you cancel the job.
+Your Talapas Desktop job will continue to run until the requested time limit elapses or until you cancel the job. If you have trouble starting an
+interactive session, make sure that you don't have another one running.
 
 If you finish your work before the time limit ends, you 
 can free up resources for other Talapas users by clicking the red **Delete** button
