@@ -28,7 +28,7 @@ Just like any Talapas job, the more resources you ask for, the longer it will ta
 
 **CPU Cores:** You must ask for at least `1`. Only code or software packages that are configured to do so can take advantage of multiple cores.
 
-**Total memory:** We typically recommend 4GB per CPU core. You can ask for up to 192GB on `interactive` and up to 48GB on `interactivegpu`. 
+**Total memory:** We typically recommend 4GB per CPU core. You can ask for up to 192GB *total* on `interactive` and up to 48GB *total* on `interactivegpu`. 
 
 **GPU enabled:** Only check if you require a GPU. To use a GPU, this box must be checked **AND** you must run on the `interactivegpu` partition.
 
@@ -55,7 +55,9 @@ load desired modules, and run scripts against data on GPFS *without* interacting
 
 Want to run RStudio on Talapas? Perform the following steps:
 
-1. Open a Mate Terminal session from within Talapas Desktop.
+1. Open a Mate Terminal session from within Talapas Desktop. 
+You need to be on Talapas Desktop in order
+to see the RStudio interface.
 2. Load the version of R you require. Here we use 4.4.2, but feel free to choose whichever you need.
     ```bash
     module load R/4.4.2
@@ -72,11 +74,12 @@ Want to run RStudio on Talapas? Perform the following steps:
 
 ![rstudio](../images/rstudio.JPG)*An example RStudio session on Talapas Desktop*
 
-## Cleaning Up
-
-Your Talapas Desktop job will continue to run until the requested time limit elapses or until you cancel the job. If you have trouble starting an
-interactive session, make sure that you don't have another one running.
-
+## Troubleshooting Talapas Desktop
 If you finish your work before the time limit ends, you 
 can free up resources for other Talapas users by clicking the red **Delete** button
 for the job as it appears on the OnDemand sessions page.
+
+Your Talapas Desktop session will continue to run until the requested time limit elapses or until you cancel the job. If you have trouble starting an
+interactive session, *make sure that you don't have another one running*.
+
+

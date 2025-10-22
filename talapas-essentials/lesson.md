@@ -126,11 +126,14 @@ These pointers are added for your convenience so that you can move files and cod
 Some new PIRGs do not have this symlink in place. Do not worry, you can still access the same folder through `/projects/PIRG_NAME`. PIs can request that the symlink be added to their lab members' project directories.
 
 ## Which Folder Should I Use for What?
-`/home/yourDuckID`
+`/home/yourDuckID` - **250GB quota**
 - code, testing instances, personal work
 
-`/projects/yourPIRG` 
+`/projects/yourPIRG` - **2TB shared quota**
 - datasets, project data, code you want to share with other members of your PIRG
+
+`/scratch/yourPIRG` - **20GB shared quota**
+- data used within 90 days, intermediate outputs or inputs, temporary files
 
 ## Transferring Files to Talapas
 There are a variety of ways to transfer files to and from Talapas based on your use case.
@@ -221,24 +224,6 @@ echo $PATH
 ```
 
 Talapas also supports compiled languages like C and C++. Compilers like gcc and aocc are available as modules.
-
-### R and RStudio
-
-R can be loaded as a module.
-
-```bash
-module load R/4.4.2 
-```
-
-To use RStudio with the Talapas filesystem, load the rstudio/base module and launch the GUI application with the 
-command `rstudio`.
-
-```bash
-module load rstudio/base
-rstudio
-```
-
-![rstudio](../images/rstudio.JPG)
 
 ### Browsing Modules
 Want a more user friendly list of modules available?
@@ -401,46 +386,34 @@ On any other partition, your job will run until it either
 finishes, meets the time limit you requested, or 
 exceeds the resources you requested.
 
-## Slurm: The Talapas Scheduler
+## Introducing Conda Environments
+[Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html) is 
+tool for managing virtual environments
+available on Talapas.
+Conda helps you manage different coding environments for different projects. 
 
-[Slurm](https://slurm.schedmd.com/slurm.html) is the job scheduling software used on the Talapas. While Talapas has scheduling policies, partitions, and PIRGs that are specific to UO, 
-Slurm is used for job scheduling on high-performance computing clusters around the world.
+We will discuss Conda more in future lessons, but today we will
+demonstrate how it works and how
+to use it to create Python environments
+from the command line.
 
-To schedule jobs on Talapas, you must give Slurm a *partition* where the job must run
-and an *account* (PIRG) associated with the job.
+### Loading the Conda Module
+To use Conda, you must load the `miniconda3/20240410` module.
+```bash
+module load miniconda3/20240410
+```
 
-Slurm manages a queue of jobs that determines which node(s) on a partition your job will run.
+Check the module is loaded with `module list`.
+```bash
+module list
+```
 
-## Conda Environments
-[Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html) is an open-source package and environment management system. 
-It helps you easily install, run, and update software packages and manage isolated environments for different projects. 
+```output
+Currently Loaded Modules:
+  1) miniconda3/20240410
+```
 
-Conda works across platforms (Windows, macOS, Linux) and is especially popular in data science and scientific computing because it handles complex dependency situations like:
-  - Python packages that require older versions of Python
-  - non-Python libraries like R and Julia
-  - packages from different channels (conda, conda-forge, pip)
-
-RACS has a detailed guide for [building, creating, and loading conda environments](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_create_personal_conda_envs) on Talapas.
-We will walk through some of these steps in this exercise.
-
-### Benefits of Using Conda
-1. Conda environments allow for reproducibility and consistency when running code on different devices and operating systems.
-2. Conda only loads the packages you need for that specific workflow (helps reduce the amount of "clutter" in your environment)
-3. Each Conda environment is a self-contained workspace, so you can: 
-    - Use different Python versions side-by-side (e.g. Python 3.10 & 3.12)
-    - Avoid dependency conflicts between projects
-
-Many researchers maintain separate conda environments for different projects and contexts.
-We highly recommend this approach for reproducibility, consistency, and ease of replicating environmental configurations
-among colleagues.
-
-### Conda Options on Talapas 
-We have two main conda distributions available to users: 
-- **miniconda3/20240410** offical source, maintained by anaconda, uses defaults as default channel, minimal installer for the Anaconda ecosystem
-- **miniforge3/20240410** open-source distribution, maintained by community, uses conda-forge as default channel, fully open-source conda installer using community packages. 
-
-### Looking at Available Environments
-
+### Looking at Available Conda Environments
 List the conda environments available to you with `conda env list`. 
 
 There are a number of public conda environments maintained by RACS in the `/packages/miniconda3/20240410/envs/` folder.
@@ -461,14 +434,10 @@ ancestryhmm-v2           /packages/miniconda3/20240410/envs/ancestryhmm-v2
 argweaver-20241202       /packages/miniconda3/20240410/envs/argweaver-20241202
 bgchm-20241008           /packages/miniconda3/20240410/envs/bgchm-20241008
 brainiak-20240412        /packages/miniconda3/20240410/envs/brainiak-20240412
-dcm2bids-20240904        /packages/miniconda3/20240410/envs/dcm2bids-20240904
-dcm2niix-20240416        /packages/miniconda3/20240410/envs/dcm2niix-20240416
-fmriprep-docker          /packages/miniconda3/20240410/envs/fmriprep-docker
-gambit_bsm-20240416      /packages/miniconda3/20240410/envs/gambit_bsm-20240416
-gnomix                   /packages/miniconda3/20240410/envs/gnomix
 ...
 ```
 
+### Creating Conda Environments 
 Let's create a new environment named `workshop-fall` that will be stored inside the `.conda` folder of your home directory.
 You can specify which python version is used through the `python=` argument.
 
@@ -546,8 +515,57 @@ numpy                     2.2.5           py312h2470af2_0
 numpy-base                2.2.5           py312h06ae042_0  
 ```
 
-### Scheduling Simple Jobs with Slurm
+Confirm that your conda environment works by opening
+a Python interpreter and importing one of the 
+installed packages. Remember, you should not be
+doing *work* on the login node.
 
+```bash
+python
+```
+
+```output
+Python 3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:16:04) [GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+```
+
+Let's import numpy `import numpy as np` and confirm that
+it works by creating a 1-dimensional array and summing it.
+
+```python
+x = np.array([1,2,3])
+x.sum()
+```
+
+```output
+np.int64(6)
+```
+
+### Creating Conda Environments for Your Code
+As you migrate Python code to Talapas, inspect *import statements*
+to identify packages that will need you need to install
+to a conda environment on Talapas. 
+
+Not sure what version of a Python package you're running?
+You can quickly check by using the `__version__` attribute.
+
+```python
+# Replace lxml with your package of choice
+import lxml
+print(lxml.__version__)
+```
+
+
+## Slurm: The Talapas Scheduler
+[Slurm](https://slurm.schedmd.com/slurm.html) is the job scheduling software used on the Talapas. While Talapas has scheduling policies, partitions, and PIRGs that are specific to UO, 
+Slurm is used for job scheduling on high-performance computing clusters around the world.
+
+To schedule jobs on Talapas, you must give Slurm a *partition* where the job must run
+and an *account* (PIRG) associated with the job.
+
+Slurm manages a queue of jobs that determines which node(s) on a partition your job will run.
+
+### Scheduling Simple Jobs with Slurm
 To practice with Slurm tasks, connect to a Talapas login node. For this exercise, feel free to use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
 
 ## Batch Scheduling with `sbatch`

@@ -9,8 +9,6 @@ nav_order: 2
 
 # Advanced Slurm
 This lesson expands on the principles of Slurm job configuration and parallelization introduced in the first Slurm lesson. 
-It also introduces [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/index.html), a popular software package and virtual environment management tool available on Talapas that can be used
-to configure virtual environments for batch scripts or interactive jobs.
 
 ## Lesson Setup
 For this lesson, you will need to connect to a Talapas login node through a shell application of your choice.
@@ -386,16 +384,14 @@ In summary, parallelism on Talapas is enabled by
 Without meeting these requirements, your jobs will run serially.
 
 ## Conda Environments
-[Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html) is an open-source package and environment management system. 
-It helps you easily install, run, and update software packages and manage isolated environments for different projects. 
+RACS has a detailed guide for [building, creating, and loading conda environments](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_create_personal_conda_envs) on Talapas.
+We will go over some of the more advanced
+capabiltiies of conda today.
 
-Conda works across platforms (Windows, macOS, Linux) and is especially popular in data science and scientific computing because it handles complex dependency situations like:
+Conda is especially popular in data science and scientific computing because it handles complex dependency situations like:
   - Python packages that require older versions of Python
   - non-Python libraries like R and Julia
   - packages from different channels (conda, conda-forge, pip)
-
-RACS has a detailed guide for [building, creating, and loading conda environments](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_create_personal_conda_envs) on Talapas.
-We will walk through some of these steps in this exercise.
 
 ### Benefits of Using Conda
 1. Conda environments allow for reproducibility and consistency when running code on different devices and operating systems.
@@ -415,6 +411,7 @@ We have two main conda distributions available to users:
 
 ### Building a Conda Environment from Scratch
 Copy the `conda` folder to your home directory and navigate inside.
+
 ```bash
 cp -r /projects/racs_training/conda/  ~
 cd ~/conda
@@ -434,123 +431,8 @@ Let's load the `miniconda3/20240410` module.
 module load miniconda3/20240410
 ```
 
-Check the module is loaded with `module list`.
-```bash
-module list
-```
-
-```output
-Currently Loaded Modules:
-  1) miniconda3/20240410
-```
-
-List the conda environments available to you with `conda env list`. 
-
-There are a number of public conda environments maintained by RACS in the `/packages/miniconda3/20240410/envs/` folder.
-If you have not created any conda environments of your own, then only the public environments compiled by
-RACS will be listed. 
-
-```bash
-conda env list
-```
-
-```output
-# conda environments:
-#
-base                     /packages/miniconda3/20240410
-R-test-pack              /packages/miniconda3/20240410/envs/R-test-pack
-SE3nv                    /packages/miniconda3/20240410/envs/SE3nv
-ancestryhmm-v2           /packages/miniconda3/20240410/envs/ancestryhmm-v2
-argweaver-20241202       /packages/miniconda3/20240410/envs/argweaver-20241202
-bgchm-20241008           /packages/miniconda3/20240410/envs/bgchm-20241008
-brainiak-20240412        /packages/miniconda3/20240410/envs/brainiak-20240412
-dcm2bids-20240904        /packages/miniconda3/20240410/envs/dcm2bids-20240904
-dcm2niix-20240416        /packages/miniconda3/20240410/envs/dcm2niix-20240416
-fmriprep-docker          /packages/miniconda3/20240410/envs/fmriprep-docker
-gambit_bsm-20240416      /packages/miniconda3/20240410/envs/gambit_bsm-20240416
-gnomix                   /packages/miniconda3/20240410/envs/gnomix
-...
-```
-
-
-Let's create a new environment named `myenv` that will be stored inside the `.conda` folder of your home directory.
-You can specify which python version is used through the `python=` argument.
-
-```bash
-conda create --name myenv python=3.12 numpy matplotlib
-```
-
-This command creates an environment with the **numpy** and **matplotlib** packages. When Conda finishes building the environment, you will see a message like this.
-
-```output
-Preparing transaction: done                                 
-Verifying transaction: done                                 
-Executing transaction: done                                 
-#                                                           
-# To activate this environment, use                         
-#                                                           
-#     $ conda activate myenv                                
-#                                                           
-# To deactivate an active environment, use                  
-#                                                           
-#     $ conda deactivate 
-```
-
-To activate *myenv*, run the `conda activate` command.
-
-```bash
-conda activate myenv
-```
-
-Observe that your environment name will now appear to the left of your terminal prompt.
-```output
-(myenv) [emwin@login2 conda]$     
-```
-
-From inside our conda environment, we can run the `which python` command to confirm we are using the Python instance stored inside *myenv*.
-
-```bash
-which python
-```
-
-```output
-~/.conda/envs/myenv/bin/python  
-```
-
-To see which packages are in the current environment, use `conda list`.
-
-```bash
-conda list
-```
-
-We can scroll through the list to find `matplotlib` and `numpy`.
-```output
-...
-matplotlib                3.10.0          py312h06a4308_0  
-matplotlib-base           3.10.0          py312hbfdbfaf_0  
-mkl                       2023.1.0         h213fc3f_46344  
-mkl-service               2.4.0           py312h5eee18b_2  
-mkl_fft                   1.3.11          py312h5eee18b_0  
-mkl_random                1.2.8           py312h526ad5a_0  
-mysql                     8.4.0                h721767e_2  
-ncurses                   6.4                  h6a678d5_0  
-numpy                     2.2.5           py312h2470af2_0
-...
-```
-
-Alternatively, use of piping and `grep` will return only the lines that reference the packages of interest.
-```bash
- conda list | grep -E "matplotlib|numpy"
-```
-
-```output
-matplotlib                3.10.0          py312h06a4308_0  
-matplotlib-base           3.10.0          py312hbfdbfaf_0  
-numpy                     2.2.5           py312h2470af2_0  
-numpy-base                2.2.5           py312h06ae042_0  
-```
-
-Inspect `hello_world.py` with `nano`.
+Before creating an environment to run it, inspect the
+Python script `hello_world.py` with `nano`.
 
 ```bash
 nano hello_world.py
@@ -593,12 +475,41 @@ For those unfamiliar with Python, this script executes the following statements:
 
 A login node is *not* an appopriate location to run non-trivial scripts, but this toy script is safe to test there.
 
+Let's create a new environment named `myenv` that will be stored inside the `.conda` folder of your home directory.
+You can specify which python version is used through the `python=` argument.
+
+```bash
+conda create --name myenv python=3.12 numpy matplotlib
+```
+
+This command creates an environment with the **numpy** and **matplotlib** packages. When Conda finishes building the environment, you will see a message like this.
+
+```output
+Preparing transaction: done                                 
+Verifying transaction: done                                 
+Executing transaction: done                                 
+#                                                           
+# To activate this environment, use                         
+#                                                           
+#     $ conda activate myenv                                
+#                                                           
+# To deactivate an active environment, use                  
+#                                                           
+#     $ conda deactivate 
+```
+
+To activate *myenv*, run the `conda activate` command.
+
+```bash
+conda activate myenv
+```
 
 Use the `python` command to run the version of Python in the active conda environment.
 
 ```bash
 python hello_world.py
 ```
+
 ```output
 Traceback (most recent call last):
   File "/gpfs/home/emwin/conda/hello_world.py", line 4, in <module>
