@@ -20,7 +20,7 @@ nav_order: 8
     - Move input and output data to your PIRG's projects folder. 
     - Archive data you no longer need elsewhere.
 * Is data on Talapas backed up?
-    - No, but there are filesystem backups. Reach out to RACS **immediately** if you accidentally delete important data.
+    - No, there are no backups on Talapas.
     - If your funding agency requires backups of data, Talapas does not qualify. Consider booking a [data consultation](https://uoregon.libcal.com/appointments/data_services) if you need help finding a compliant backup solution.
 * Is there a *web version* of the module catalog? I want to know what software is available on Talapas without logging in.
     - It's in progress.

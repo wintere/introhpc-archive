@@ -25,18 +25,19 @@ repetitive, highly parallel computational jobs from researchers' devices, allowi
 
 Talapas is a heterogenous cluster consisting of hundreds of individual computers called nodes. 
 It is made up of login nodes, compute nodes, and private "condo" nodes. 
-These nodes are much more powerful than a personal computer! Each compute node can have up to 128 CPU cores. Some specialized nodes for large memory jobs have up to 4TB of RAM.
+These nodes are much more powerful than a personal computer! Each compute node has up to 128 CPU cores. Nodes typically have at least 500GB of RAM, 
+and specialized nodes for large memory jobs can have up to 4TB of RAM.
 
 ![talapas-hierarchy](../images/talapas-structure.png)
 
 Talapas is a living, growing computational ecosystem. New software is added upon request, 
-CPU and GPU hardware is periodically upgraded, and new computing nodes are added as research groups buy special nodes for their needs.
+CPU and GPU hardware is periodically upgraded, and new computing nodes are added as research groups buy special "condo" nodes for their needs.
 
 ### Getting to Talapas: Login Nodes
 
 The four login nodes are shared by hundreds of Talapas users simultaneously. 
-The login nodes share the same filesystem, but having multiple login nodes adds redundancy and fewer points of failure to the Talapas ecosystem.
-They are intended for loading data, transferring large datasets from the internet or the cloud to the Talapas filesystem, preparing software environments, and connecting to IDEs.Unlike other nodes in the cluster, login nodes are open to connections from the broader internet.
+The login nodes share the same filesyste. Having multiple login nodes adds redundancy and fewer points of failure to the Talapas ecosystem.
+Login nodes are intended for loading data, transferring large datasets from the internet or the cloud to the Talapas filesystem, preparing software environments, and connecting to IDEs. Unlike other nodes in the cluster, login nodes are open to connections from the broader internet. 
 
 The CPU cores and memory on login nodes are **not** for doing computational work.
 
@@ -58,14 +59,13 @@ all non-trivial work occurs on *compute nodes*.
 
 The compute nodes on Talapas are grouped into *partitions* based
 on what resources they have, how long those resources can be used, and (in the case of condo nodes) which users can access them.
-Each node
 
 ## The Talapas Filesystem
 
 Talapas uses a networked filesystem called GPFS to make code, input files, and other crucial pieces of data available across all nodes in the cluster.
 
-All users have 256GB of storage available to them in their home directory at `/home/yourDuckID`. 
-No other users have access to your home directory.
+All users have 250GB of storage available to them in their home directory at `/home/yourDuckID`. 
+No other users have permission to access to your home directory.
 
 You can check your home directory path by using the following Bash command.
 
@@ -79,6 +79,11 @@ Unless extra storage has been negotiated, PIRG project directories have a maximu
 Because the [file structure for PIRGs recently changed](https://uoracs.github.io/talapas2-knowledge-base/docs/directory_structure/), some PIRGS may have a slightly different stucture in their `/projects/PIRG_NAME` folder.
 
 You can also explore the filesystem and even upload files of up to 10GB in the [Talapas Files app](../talapas-scripting/setup.html#OnDemand -> Files).
+
+Need temporary storage? The `/scratch/PIRG_NAME` directory
+associated with your PIRG has 20TB of storage. Data in
+`/scratch/` not accessed within the last 90 days will be
+deleted.
 
 ### New PIRGs
 Joined Talapas recently? This implementation assumes all files and folders within a PIRG are shared among all members.
@@ -122,11 +127,14 @@ These pointers are added for your convenience so that you can move files and cod
 Some new PIRGs do not have this symlink in place. Do not worry, you can still access the same folder through `/projects/PIRG_NAME`. PIs can request that the symlink be added to their lab members' project directories.
 
 ## Which Folder Should I Use for What?
-`/home/yourDuckID`
+`/home/yourDuckID` - **250GB quota**
 - code, testing instances, personal work
 
-`/projects/yourPIRG` 
+`/projects/yourPIRG` - **2TB shared quota**
 - datasets, project data, code you want to share with other members of your PIRG
+
+`/scratch/yourPIRG` - **20GB shared quota**
+- data used within 90 days, intermediate outputs or inputs, temporary files
 
 ## Transferring Files to Talapas
 There are a variety of ways to transfer files to and from Talapas based on your use case.
@@ -218,24 +226,6 @@ echo $PATH
 
 Talapas also supports compiled languages like C and C++. Compilers like gcc and aocc are available as modules.
 
-### R and RStudio
-
-R can be loaded as a module.
-
-```bash
-module load R/4.4.2 
-```
-
-To use RStudio with the Talapas filesystem, load the rstudio/base module and launch the GUI application with the 
-command `rstudio`.
-
-```bash
-module load rstudio/base
-rstudio
-```
-
-![rstudio](../images/rstudio.JPG)
-
 ### Browsing Modules
 Want a more user friendly list of modules available?
 
@@ -296,7 +286,12 @@ module avail
    adapterremoval/2.3.3   
 ```
 
-You can scroll through the list produced by `module avail` using the arrow keys. Press <kbd>Q</kbd> to quit.
+You can scroll through the list produced by `module avail` using the arrow keys. Press <kbd>Q</kbd> to quit. Default versions of a module are indicated 
+with `(D)`. Remember that defaults can change over time!
+
+Talapas modules are maintained by RACS. If software you need
+for your workflow is unavailable, you can request the creation
+of new modules [through the Talapas ticketing system](https://hpcrcf.atlassian.net/servicedesk/customer/portal/1).
 
 ### Reproducibility with Modules
 Always use complete module names in your batch jobs and scripts when possible.
@@ -326,7 +321,7 @@ Here is a summary of the primary partitions on Talapas so you can decide where t
 
 ### Partition Status: `sinfo`
 
-Want to know the current status and time limits of *all* the partitions on Talapas? The command `sinfo` displays all available partitions that **you** can schedule jobs on. (That means condo owners will see a slightly different list.)
+Want to know the current status and time limits of *all* the partitions on Talapas? The command `sinfo` displays all available partitions that **you** can schedule jobs on.
 
 ```bash
 sinfo
@@ -336,31 +331,35 @@ Each partition has one line for each state in order to list the number of nodes 
 
 ```output
 PARTITION         AVAIL  TIMELIMIT  NODES  STATE NODELIST
-compute              up 1-00:00:00      6  drain n[0112-0117]
-compute              up 1-00:00:00     36    mix n[0111,0118-0135,0180-0196]
-compute_intel        up 1-00:00:00     20    mix n[0049-0058,0073-0082]
-compute_intel        up 1-00:00:00     12  alloc n[0083-0090,0092-0093,0105,0107]
-compute_intel        up 1-00:00:00     19   idle n[0059-0072,0091,0094-0096,0106]
-computelong          up 14-00:00:0     30    mix n[0119-0134,0136,0180-0192]
-computelong_intel    up 14-00:00:0     20    mix n[0049-0058,0073-0082]
-computelong_intel    up 14-00:00:0     12  alloc n[0083-0090,0092-0093,0105,0107]
-computelong_intel    up 14-00:00:0     19   idle n[0059-0072,0091,0094-0096,0106]
-gpu                  up 1-00:00:00     22    mix n[0149-0150,0152-0160,0162-0169,0171-0172,0301]
-gpu                  up 1-00:00:00      1  alloc n0151
-gpulong              up 14-00:00:0     17    mix n[0150,0152-0153,0155-0157,0162-0169,0171-0172,0301]
-interactive          up   12:00:00      2    mix n[0209-0210]
-interactive          up   12:00:00      9   idle n[0211-0212,0302,0310-0313,0398-0399]
+compute              up 1-00:00:00      1   drng n0135
+compute              up 1-00:00:00     35    mix n[0111-0120,0122-0133,0181-0185,0187,0189-0190,0192-0196]
+compute              up 1-00:00:00      4  alloc n[0180,0186,0188,0191]
+compute              up 1-00:00:00      2   idle n[0121,0134]
+compute_intel        up 1-00:00:00     17    mix n[0055-0056,0063-0064,0073,0078,0081-0082,0084,0087-0089,0092,0094,0096,0106-0107]
+compute_intel        up 1-00:00:00     33  alloc n[0049-0050,0052-0054,0057-0062,0065-0072,0074-0077,0079-0080,0083,0085-0086,0090-0091,0093,0095,0105]
+computelong          up 14-00:00:0      1   drng n0136
+computelong          up 14-00:00:0     23    mix n[0119-0120,0122-0133,0181-0185,0187,0189-0190,0192]
+computelong          up 14-00:00:0      4  alloc n[0180,0186,0188,0191]
+computelong          up 14-00:00:0      2   idle n[0121,0134]
+computelong_intel    up 14-00:00:0     17    mix n[0055-0056,0063-0064,0073,0078,0081-0082,0084,0087-0089,0092,0094,0096,0106-0107]
+computelong_intel    up 14-00:00:0     33  alloc n[0049-0050,0052-0054,0057-0062,0065-0072,0074-0077,0079-0080,0083,0085-0086,0090-0091,0093,0095,0105]
+gpu                  up 1-00:00:00     19    mix n[0149-0160,0162-0167,0301]
+gpu                  up 1-00:00:00      1  alloc n0171
+gpu                  up 1-00:00:00      3   idle n[0168-0169,0172]
+gpulong              up 14-00:00:0     12    mix n[0150,0152-0153,0155-0157,0162-0167]
+gpulong              up 14-00:00:0      1  alloc n0171
+gpulong              up 14-00:00:0      3   idle n[0168-0169,0172]
+interactive          up   12:00:00      9    mix n[0210,0212,0302,0308-0309,0311-0313,0398]
+interactive          up   12:00:00      9  alloc n[0209,0211,0303-0307,0310,0399]
 interactivegpu       up    8:00:00      1    mix n0161
-memory               up 1-00:00:00      8    mix n[0142,0372-0374,0376-0379]
-memory               up 1-00:00:00      6  alloc n[0141,0143-0146,0375]
-memory               up 1-00:00:00      2   idle n[0147-0148]
-memorylong           up 14-00:00:0      5    mix n[0142,0372,0374,0376,0378]
-memorylong           up 14-00:00:0      2  alloc n[0144,0146]
-memorylong           up 14-00:00:0      1   idle n0148
-preempt              up 7-00:00:00      6  drain n[0112-0117]
-preempt              up 7-00:00:00    158    mix n[0037-0046,0049-0058,0073-0082,0109-0111,0118-0136,0142,0149-0150,0152-0169,0171-0175,0180-0189,0191-0197,0209-0210,0221,0224,0230-0242,0244-0247,0262,0265-0270,0301,0303,0314-0316,0336,0349-0351,0363-0365,0372-0374,0376-0380,0385-0388,0390-0396,0997-1000]
-preempt              up 7-00:00:00     56  alloc n[0083-0090,0092-0093,0105,0107,0141,0143-0146,0151,0201-0204,0223,0225-0226,0229,0248-0249,0254-0261,0263-0264,0317-0326,0346,0348,0359-0362,0375,0389]
-preempt              up 7-00:00:00     96   idle n[0059-0072,0091,0094-0096,0106,0147-0148,0176-0179,0205-0208,0211-0220,0222,0227-0228,0250-0253,0302,0304-0313,0327-0335,0337-0345,0347,0352-0358,0366-0371,0381-0384,0397-0399]
+memory               up 1-00:00:00      7    mix n[0148,0372,0374,0376-0379]
+memory               up 1-00:00:00      9  alloc n[0141-0147,0373,0375]
+memorylong           up 14-00:00:0      5    mix n[0148,0372,0374,0376,0378]
+memorylong           up 14-00:00:0      3  alloc n[0142,0144,0146]
+preempt              up 7-00:00:00      2   drng n[0135-0136]
+preempt              up 7-00:00:00    114    mix n[0038-0039,0041,0043,0055-0056,0063-0064,0073,0078,0081-0082,0084,0087-0089,0092,0094,0096,0106-0107,0111-0120,0122-0133,0148-0167,0170,0181-0185,0187,0189,0192-0196,0210,0212-0214,0216,0221-0222,0224-0226,0267,0270,0301-0302,0308-0309,0311-0313,0363-0364,0368,0370,0372,0374,0376-0379,0388-0389,0391-0394,0396-0398]
+preempt              up 7-00:00:00    181  alloc n[0037,0040,0042,0044-0046,0049-0050,0052-0054,0057-0062,0065-0072,0074-0077,0079-0080,0083,0085-0086,0090-0091,0093,0095,0105,0109-0110,0141-0147,0171,0173-0180,0186,0188,0191,0197,0201-0209,0211,0215,0218-0220,0223,0227-0242,0244-0266,0268-0269,0303-0307,0310,0314-0348,0359-0362,0369,0371,0373,0375,0380-0387,0390,0395,0399,0996-0999]
+preempt              up 7-00:00:00      5   idle n[0121,0134,0168-0169,0172]
 ```
 You can interpret the results from `sinfo` as follows. 
 Nodes are grouped by partition and state.
@@ -388,8 +387,177 @@ On any other partition, your job will run until it either
 finishes, meets the time limit you requested, or 
 exceeds the resources you requested.
 
-## Slurm: The Talapas Scheduler
+## Introducing Conda Environments
+[Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html) is 
+tool for managing virtual environments
+available on Talapas.
+Conda helps you manage different coding environments for different projects. 
 
+We will discuss Conda more in future lessons, but today we will
+demonstrate how it works and how
+to use it to create Python environments
+from the command line.
+
+### Loading the Conda Module
+To use Conda, you must load the `miniconda3/20240410` module.
+```bash
+module load miniconda3/20240410
+```
+
+Check the module is loaded with `module list`.
+```bash
+module list
+```
+
+```output
+Currently Loaded Modules:
+  1) miniconda3/20240410
+```
+
+### Looking at Available Conda Environments
+List the conda environments available to you with `conda env list`. 
+
+There are a number of public conda environments maintained by RACS in the `/packages/miniconda3/20240410/envs/` folder.
+If you have not created any conda environments of your own, then only the public environments compiled by
+RACS will be listed. 
+
+```bash
+conda env list
+```
+
+```output
+# conda environments:
+#
+base                     /packages/miniconda3/20240410
+R-test-pack              /packages/miniconda3/20240410/envs/R-test-pack
+SE3nv                    /packages/miniconda3/20240410/envs/SE3nv
+ancestryhmm-v2           /packages/miniconda3/20240410/envs/ancestryhmm-v2
+argweaver-20241202       /packages/miniconda3/20240410/envs/argweaver-20241202
+bgchm-20241008           /packages/miniconda3/20240410/envs/bgchm-20241008
+brainiak-20240412        /packages/miniconda3/20240410/envs/brainiak-20240412
+...
+```
+
+### Creating Conda Environments 
+Let's create a new environment named `workshop-fall` that will be stored inside the `.conda` folder of your home directory.
+You can specify which python version is used through the `python=` argument.
+
+```bash
+conda create --name workshop-fall python=3.12 numpy matplotlib
+```
+
+This command creates an environment with the **numpy** and **matplotlib** packages. When Conda finishes building the environment, you will see a message like this.
+
+```output
+Preparing transaction: done                                 
+Verifying transaction: done                                 
+Executing transaction: done                                 
+#                                                           
+# To activate this environment, use                         
+#                                                           
+#     $ conda activate fall-workshop                               
+#                                                           
+# To deactivate an active environment, use                  
+#                                                           
+#     $ conda deactivate 
+```
+
+To activate *myenv*, run the `conda activate` command.
+
+```bash
+conda activate fall-workshop
+```
+
+Observe that your environment name will now appear to the left of your terminal prompt.
+```output
+(fall-workshop) [emwin@login2 conda]$     
+```
+
+From inside our conda environment, we can run the `which python` command to confirm we are using the Python instance stored inside *myenv*.
+
+```bash
+which python
+```
+
+```output
+~/.conda/envs/fall-workshop/bin/python  
+```
+
+To see which packages are in the current environment, use `conda list`.
+
+```bash
+conda list
+```
+
+We can scroll through the list to find `matplotlib` and `numpy`.
+```output
+...
+matplotlib                3.10.0          py312h06a4308_0  
+matplotlib-base           3.10.0          py312hbfdbfaf_0  
+mkl                       2023.1.0         h213fc3f_46344  
+mkl-service               2.4.0           py312h5eee18b_2  
+mkl_fft                   1.3.11          py312h5eee18b_0  
+mkl_random                1.2.8           py312h526ad5a_0  
+mysql                     8.4.0                h721767e_2  
+ncurses                   6.4                  h6a678d5_0  
+numpy                     2.2.5           py312h2470af2_0
+...
+```
+
+Alternatively, use of piping and `grep` will return only the lines that reference the packages of interest.
+```bash
+ conda list | grep -E "matplotlib|numpy"
+```
+
+```output
+matplotlib                3.10.0          py312h06a4308_0  
+matplotlib-base           3.10.0          py312hbfdbfaf_0  
+numpy                     2.2.5           py312h2470af2_0  
+numpy-base                2.2.5           py312h06ae042_0  
+```
+
+Confirm that your conda environment works by opening
+a Python interpreter and importing one of the 
+installed packages. Remember, you should not be
+doing *work* on the login node.
+
+```bash
+python
+```
+
+```output
+Python 3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:16:04) [GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+```
+
+Let's import numpy `import numpy as np` and confirm that
+it works by creating a 1-dimensional array and summing it.
+
+```python
+x = np.array([1,2,3])
+x.sum()
+```
+
+```output
+np.int64(6)
+```
+
+### Creating Conda Environments for Your Code
+As you migrate Python code to Talapas, inspect *import statements*
+to identify packages that will need you need to install
+to a conda environment on Talapas. 
+
+Not sure what version of a Python package you're running?
+You can quickly check by using the `__version__` attribute.
+
+```python
+# Replace lxml with your package of choice
+import lxml
+print(lxml.__version__)
+```
+
+
+## Slurm: The Talapas Scheduler
 [Slurm](https://slurm.schedmd.com/slurm.html) is the job scheduling software used on the Talapas. While Talapas has scheduling policies, partitions, and PIRGs that are specific to UO, 
 Slurm is used for job scheduling on high-performance computing clusters around the world.
 
@@ -399,7 +567,6 @@ and an *account* (PIRG) associated with the job.
 Slurm manages a queue of jobs that determines which node(s) on a partition your job will run.
 
 ### Scheduling Simple Jobs with Slurm
-
 To practice with Slurm tasks, connect to a Talapas login node. For this exercise, feel free to use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
 
 ## Batch Scheduling with `sbatch`
@@ -499,5 +666,6 @@ We will look at Slurm and several associated commands in detail in the next sess
 ## Shared Resource Etiquette
 - Be conscientious about your use of shared storage in the `/projects/[yourPIRG]` folder.
 - Close out your jobs when you're done!
+- Avoid *modifying* the same files concurrently; this is a shared filesystem.
 - Book your interactive jobs for as long as you need, but not longer.
 - You will not be warned when time is about to run out when running interactive jobs or the Talapas Desktop app. Track your own time conscientiously. 
