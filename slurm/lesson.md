@@ -1446,7 +1446,7 @@ on [configuring interactive jobs on Talapas](https://uoracs.github.io/talapas2-k
 ### Quick Slurm Scheduling Tips
 * Read the resource descriptions carefully: jobs that exceed their request time, memory, or processor usage will be automatically killed.
 * Need to run for more than 24 hours? You must use `computelong`, `gpulong`, or `memorylong`.
-* Most jobs should have `--ntasks-per-node=1` `--cpus-per-task=1` if they do not reference tools or code that is explicitly multiprocessor code.
+* Most jobs should have `--nodes=1` if they don't use MPI.
 * Remember to exit interactive jobs when you're finished to free up resources for your colleagues.
 
 ## Today's Slurm Commands
