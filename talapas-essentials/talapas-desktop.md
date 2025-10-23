@@ -9,7 +9,8 @@ nav_order: 4
 
 # Talapas Desktop
 
-Want to use Talapas with a GUI? You can use the [Talapas Desktop App](https://ondemand.talapas.uoregon.edu/pun/sys/dashboard/batch_connect/sys/bc_desktop/talapas/session_contexts/new) to run code on *interactive* compute nodes for up to 12 hours. This app will launch an interactive desktop on one or more compute nodes. You will have full access to the resources these nodes provide. This is analogous to an [interactive Slurm job](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755756536/How-to+Start+an+Interactive+Job).
+Want to use Talapas with a GUI? You can use the [Talapas Desktop App](https://ondemand.talapas.uoregon.edu/pun/sys/dashboard/batch_connect/sys/bc_desktop/talapas/session_contexts/new) to run code on *interactive* compute nodes for up to 12 hours. This app will launch an interactive desktop on one or more compute nodes. You will have full access to the resources these nodes provide. 
+This is analogous to an [interactive Slurm job](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755756536/How-to+Start+an+Interactive+Job).
 
 Because Talapas Desktop sessions are connected to compute nodes, you can run code (through the terminal) or software applications directly.
 
@@ -28,7 +29,8 @@ Just like any Talapas job, the more resources you ask for, the longer it will ta
 
 **CPU Cores:** You must ask for at least `1`. Only code or software packages that are configured to do so can take advantage of multiple cores.
 
-**Total memory:** We typically recommend 4GB per CPU core. You can ask for up to 192GB *total* on `interactive` and up to 48GB *total* on `interactivegpu`. 
+**Total memory:** We recommend 4GB per CPU core. You can ask for up to 192GB on `interactive` and up to 48GB on `interactivegpu`. 
+These RAM limits are enforced across all jobs on a given partition.
 
 **GPU enabled:** Only check if you require a GPU. To use a GPU, this box must be checked **AND** you must run on the `interactivegpu` partition.
 
@@ -47,7 +49,8 @@ Click the **Launch Talapas Desktop** button to open the application.
 
 ## Running Code on Talapas Desktop
 
-Talapas Desktop sessions are held on **compute** nodes. That means you can open the **Mate Terminal**rsdum application in the top left corner,
+Talapas Desktop sessions are run on **compute** nodes.
+You can open the **Mate Terminal** application in the top left corner,
 load desired modules, and run scripts against data on GPFS *without* interacting with Slurm because you're already on the *interactive* partition.
 ![example session](../images/talapas-desktop-work.JPG)
 

@@ -81,8 +81,9 @@ Because the [file structure for PIRGs recently changed](https://uoracs.github.io
 You can also explore the filesystem and even upload files of up to 10GB in the [Talapas Files app](../talapas-scripting/setup.html#OnDemand -> Files).
 
 Need temporary storage? The `/scratch/PIRG_NAME` directory
-associated with your PIRG has 20TB of storage with
-a time limit of 90 days per last access.
+associated with your PIRG has 20TB of storage. Data in
+`/scratch/` not accessed within the last 90 days will be
+deleted.
 
 ### New PIRGs
 Joined Talapas recently? This implementation assumes all files and folders within a PIRG are shared among all members.
