@@ -23,7 +23,7 @@ cd ~
 
 Copy the `slurm_day2` folder to your home directory.
 ```bash
-cp -r /projects/racs_training/intro-hpc-s25/slurm_day2/ .
+cp -r /projects/racs_training/intro-hpc-f25/slurm_day2/ .
 ```
 
 Navigate inside the `slurm_day2` directory you copied over.
@@ -32,176 +32,12 @@ Navigate inside the `slurm_day2` directory you copied over.
 cd slurm_day2
 ```
 
-## Array Jobs: Creating Tasks from an Array of Input Files
-Check the folder contents using `ls`.
-
-```bash
-ls -F
-```
-
-```output
-books_example/  python_pi_example/
-deps_example/   snakemake_example/
-```
-
-First, we will examine the `books_example` Slurm task.
-
-Change to the `books_example` directory.
-```bash
-cd books_example
-ls -F
-```
-
-```output
-books/  books.sbatch*  logs/
-```
-
-
-In the `books` folder, you should have the text of five books.
-
-Use `ls` to list the filenames of the books stored there.
-
-```bash
-ls books
-```
-
-```output
-alice_in_wonderland.txt         moby_dick.txt            romeo_and_juliet.txt
-complete_works_shakespeare.txt  pride_and_prejudice.txt
-```
-
-Let's look at an example array job `books.sbatch` which has one subtask for each of the five books in the `books/` folder.
-
-```bash
-cat books.sbatch
-```
-
-```bash
-#!/bin/bash
-
-#SBATCH --partition=compute              ### Partition (like a queue in PBS)
-#SBATCH --account=racs_training          ### Account used for job submission
-
-### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
-#SBATCH --job-name=books_wc_array        ### Job Name
-#SBATCH --output=logs/%x-%A-%a.out       ### File in which to store job output
-#SBATCH --error=logs/%x-%A-%a.err        ### File in which to store job error messages
-
-#SBATCH --time=0-00:05:00                ### Wall clock time limit in Days-HH:MM:SS
-#SBATCH --nodes=1                        ### Number of nodes needed for the job
-#SBATCH --mem=50M                        ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
-#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
-#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
-
-#SBATCH --array=0-4
-
-BOOKS=(books/*)
-srun wc -c ${BOOKS[$SLURM_ARRAY_TASK_ID]}
-```
-
-First, the variable BOOKS is created using a wildcard `BOOKS=(books/*)`. 
-
-BOOKS is a list of the *filenames* of each of the files in the `books` folder.
-
-```output
-books/alice_in_wonderland.txt books/complete_works_shakespeare.txt books/moby_dick.txt books/pride_and_prejudice.txt books/romeo_and_juliet.txt
-```
-
-Then, srun is used to launch subtasks that compute the `wc - c` or "word count" in characters of each of the five books.
-
-```bash
-sbatch books.sbatch
-```
-
-```output
-Submitted batch job 34763686
-```
-
-Check the status of each of the five tasks using `sacct`.
-
-```bash
-sacct
-```
-
-```output
-34763686_0   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_0.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_0.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_0.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_1   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_1.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_1.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_1.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_2   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_2.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_2.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_2.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_3   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_3.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_3.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_3.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_4   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_4.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_4.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_4.0         wc            racs_trai+          1  COMPLETED      0:0 
-```
-
-These following lines of `sbatch` configuration direct the output logs to the `logs` folder.
-The `%x-%A-%a` notation creates log files named `(job name)-(array parent job)-(array index)`.out.
-
-```bash
-#SBATCH --output=logs/%x-%A-%a.out       ### File in which to store job output
-#SBATCH --error=logs/%x-%A-%a.err        ### File in which to store job error messages
-```
-
-Inspect the logs folder with `ls`.
-```bash
-ls logs
-```
-```output
-books_wc_array-34763686-0.err
-books_wc_array-34763686-0.out
-books_wc_array-34763686-1.err
-books_wc_array-34763686-1.out
-books_wc_array-34763686-2.err
-books_wc_array-34763686-2.out
-books_wc_array-34763686-3.err
-books_wc_array-34763686-3.out
-books_wc_array-34763686-4.err
-books_wc_array-34763686-4.out
-```
-Let's use `tail` and a `*` wildcard to check the last few lines of each of the output logs.
-
-```bash
-tail logs/books*.out
-```
-
-As expected, the output logs contain the results of the `wc -c` followed by
-the book that was listed as input.
-
-```output
-==> logs/books_wc_array-34763686-0.out <==
-174357 books/alice_in_wonderland.txt
-
-==> logs/books_wc_array-34763686-1.out <==
-5638516 books/complete_works_shakespeare.txt
-
-==> logs/books_wc_array-34763686-2.out <==
-1276288 books/moby_dick.txt
-
-==> logs/books_wc_array-34763686-3.out <==
-772419 books/pride_and_prejudice.txt
-
-==> logs/books_wc_array-34763686-4.out <==
-169541 books/romeo_and_juliet.txt
-```
-
 ## Evaluating Resource Usage on Running Jobs with `htop`
 Remember the `seff` command? That's a great way to evaluate resource usage of a *finished* job. But what about resource usage for running jobs?
 
 Navigate to the `python_pi_example` directory and inspect the contents.
 ```bash
-cd ../python_pi_example
+cd python_pi_example
 ls
 ```
 
@@ -348,6 +184,84 @@ The `TIME` column indicates how long the process has been running.
 
 Your connection to the compute node will terminate when your job terminates.
 After the job has finished, you can use `seff` to get more granular information about your job.
+
+## Helper Scripts From RACS
+
+Need to decide which nodes (and which partitions) are appropriate for your jobs? RACS has a script that shows available CPU and RAM on each node.
+
+```bash
+/packages/racs/bin/slurm-show-cpu-mem
+```
+
+This script shows the name of the node, the number of CPU cores on the node, and the amount of RAM (in MB) in that order for each node on Talapas.
+
+```output
+...
+n0187 128 515048
+n0188 128 515048
+n0189 128 515048
+n0190 128 515048
+n0191 128 515048
+n0192 128 515048
+n0193 128 515048
+...
+```
+
+Nodes on the compute partition typically have 128 CPU cores and 500GB of RAM.
+
+To check which partition a node belongs to, find its name in the output of the `sinfo` command,
+
+```bash
+sinfo
+```
+
+As you can see, `n0191` is one of the nodes in the **compute** partition.
+```output
+compute              up 1-00:00:00      1   plnd n0195
+compute              up 1-00:00:00      6  drain n[0112-0117]
+compute              up 1-00:00:00     35    mix n[0111,0118-0135,0180-0194,0196]
+```
+
+You may also want to know what hardware is associated with each node.
+```bash
+/packages/racs/bin/slurm-show-features
+```
+
+This script shows the node name, processor type, processor architecture, and GPU parameters for each node.
+
+Let's inspect `n0191` again.
+
+```output
+...
+n0191 amd,milan,7713
+n0192 amd,milan,7713
+n0193 amd,milan,7713
+n0194 amd,milan,7713
+n0195 amd,milan,7713
+n0196 amd,milan,7713
+n0197 intel,sapphirerapids,6448y,mem-1tb,l40s,gpu-48gb
+...
+```
+
+As you can see, `no191` has an AMD processor and it does not have a GPU.
+
+Nodes with extra RAM are indicated with `mem-[amount]` tags.
+```output
+n0372 intel,broadwell,e7-4830,mem-1t
+n0373 intel,broadwell,e7-4830,mem-1tb
+n0374 intel,broadwell,e7-4830,mem-4tb
+```
+
+Nodes with GPUs are also indicated in this list.
+```output
+n0149 amd,milan,7413,a100,gpu-10gb
+n0150 amd,milan,7413,a100,gpu-40gb
+n0151 amd,milan,7413,a100,gpu-10gb
+n0152 amd,milan,7413,a100,3xgpu-80gb,no-mig
+```
+These indicators are called features.
+We can use **constraints** to 
+direct Slurm to schedule jobs on nodes with specific features (extra RAM, GPU, CPU architecture) based on code hardware requirements.
 
 ### Don't Overwhelm the Scheduler!
 Do not make 50,000 individual jobs with `srun` and a for-loop.
