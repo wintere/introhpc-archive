@@ -286,7 +286,7 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 Let's unpack this status:
 - The job has the status R for running.
-- It's running on node n0135 on the computelong partition.
+- It's running on node n0185 on the computelong partition.
 - The job is running as emwin.
 - It has been running for 32 seconds.
 
@@ -348,9 +348,7 @@ schedule faster next time.
 This job, which spends its CPU time "sleeping" or waiting, uses very little of its requested resources.
 
 Another way to get resource usage is to
-pass in formatting arguments to the `sacct` command.
-
-We recommend inspecting **MaxRSS** (maximum memory usage) and **ReqMem** (memory requested)
+pass in formatting arguments to the `sacct` command. We recommend inspecting **MaxRSS** (maximum memory usage) and **ReqMem** (memory requested)
 to determine memory effeciency of finished jobs.
 
 Let's use `sacct` with the following parameters.
@@ -375,6 +373,10 @@ JobID           JobName     MaxRSS     ReqMem               Start    Elapsed    
 39456611.ba+      batch      0.00G            2025-10-23T13:30:22   00:01:48  CANCELLED 
 39456611.ex+     extern      0.00G            2025-10-23T13:30:22   00:01:48  COMPLETED
 ```
+
+To see a list of all possible `sacct` formatting parameters, use the
+`sacct --helpformat` command.
+
 
 ## Introducing GPU Jobs: Debugging Activity
 Let's examine an example GPU job in detail: `gpu.sbatch`.
@@ -675,7 +677,8 @@ squeue --me
 ```
 As you can observe, the serial job is running and corresponds to exactly one row in the Slurm queue.
 
-However, each step of serial steps (each subjob) is treated as a separaterow in the `sacct` command.
+However, each step of serial steps (each subjob) is treated as a separate 
+row in the `sacct` command.
 
 ```bash
 sacct
@@ -1315,7 +1318,14 @@ hostname
 n0185.talapas.uoregon.edu
 ```
 
-By default, your interactive jobs have maximum of 24 hours. Make sure to exit and cancel your job when you finish to free up resources,
+### Interactive Jobs and Partitions
+Interactive jobs inherit their default and maximum time limits
+from the limits set on the partition, just like batch jobs. 
+This means that the interactive jobs
+launched on the `compute`, `memory`, and `gpu` can request 
+a time limit of *at most* 24 hours.
+
+Make sure to exit and cancel your job when you finish to free up resources,
 
 ```bash
 exit
