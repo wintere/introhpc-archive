@@ -31,6 +31,12 @@ jupyter-racs-s25         /home/emwin/.conda/envs/jupyter-racs-s25
 
 If you do not have an environment of this name configured, the command will result in no output. 
 
+For today's activity, copy the following folder to your home directory.
+
+```bash
+cp -r /projects/racs_training/intro-hpc-f25/jupyter-class/ .
+```
+
 ### Building the `jupyter-racs-s25` Environment 
 
 To build the *jupter-racs-s25* environment, create a new file named *jupyter.yml* in `nano`.
@@ -135,11 +141,6 @@ After clicking, you will be prompted to select a specific Python kernel.
 After selecting a kernel, open the `jupyter_examples` folder in your home directory [from within the JupyterLab interface](https://jupyterlab.readthedocs.io/en/stable/user/files.html).
 
 ## Exercise Notebooks
-
-Copy the following folder to your home directory.
-```bash
-cp -r /projects/racs_training/intro-hpc-f25/jupyter-class/ .
-```
 
 You can either reference raw notebooks from this folder or the annotated
 versions below.
