@@ -82,7 +82,7 @@ srun -u python3 -u calculate_pi.py 30000
 
 This is a serial job that loads the **python3** module and executes a Python script that computes the first 30000 digits of pi. 
 Observe that this job runs on the `preempt` partition.
-Both error and output logs are written to a single `digits_of_pi.txt`, which
+Both error and output logs are written to a single `digits_of_pi.log`, which
 (if there are no errors) will contain pi approximated to the first 30000 digits.
 
 Use `cat` to inspect `calculate_pi.py`. 
@@ -95,7 +95,7 @@ cat calculate_pi.py
 ```
 
 ```python
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 
 import sys
 
@@ -198,7 +198,7 @@ htop -u $USER
 * The `USER` column is the DuckID of the user who launched the process.
 * The `RES` column measures RAM per process in KB.
 * The `CPU%` column measures the percentage of CPU time used by the process.
-A 100% indicates full usage of a CPU core. 
+100% indicates full usage of a single CPU core. 
 * The `MEM%` column indicates the percentage of memory the process is using.
 * The `TIME` column indicates how long the process has been running in seconds.
 
@@ -379,11 +379,13 @@ Memory Utilized: 5.91 MB
 Memory Efficiency: 5.91% of 100.00 MB
 ```
 
-While we requested 4 times as many CPU cores, the Python code called
-by the Slurm job is not parallelized.
-As a single-threaded, serial job, it cannot exploit
-any additional CPU resources. Therefore, the job's CPU-effeciency
-goes from 97.5% to 23.85%, and it completes no faster.
+Through Slurm allocated 4 cores, the
+script `compute_pi.py` does not distribute work among the additional cores because
+the code is not designed to take advantage of them. It *always*
+computes digits one at a time using a single CPU core; it is not
+parallelized. The job's CPU-effeciency
+goes from 97.5% to 23.85% because it only uses one of the four
+cores.
 
 This isn't to dismiss the power of parallel computing. 
 Additional CPU cores make jobs that *leverage* them complete
@@ -525,7 +527,7 @@ significant, parallelization will improve your performance more than
 simply running the same single-threaded code on a processor with a
 faster clock speed.
 
-We recommend using constraints when your job *must* run on specific
+We recommend using constraints *only* when your job *must* run on specific
 hardware. 
 
 ## Slurm Pipelines
@@ -592,23 +594,29 @@ eigh_values, _ = np.linalg.eigh(random_data)
 savename = sys.argv[2]
 np.save(savename, eigh_values)
 ```
-* `sum_eigh.py` - given a list of files as arguments,
-reads the matrices and sums them, then writes a summed matrix to an output file
-specified as the last argument
+* `sum_eigh.py` - Reads in the eigenvalues of a matrix as input,
+sums them, then outputs that sum as an array of length one.
 ```python
-import numpy as np
-import sys
+#!/bin/bash
 
-filenames = sys.argv[1:-1] 
-output_filename = sys.argv[-1]
-sum_all = np.zeros(len(filenames))
+#SBATCH --partition=compute              ### Partition (like a queue in PBS)
+#SBATCH --account=racs_training          ### Account used for job submission
 
-for i,filename in enumerate(filenames):
-    sum_all[i] =  np.load(filename)
-    sum_sort = np.sort(sum_all)
+### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
+#SBATCH --job-name=sum_eigh              ### Job Name
+#SBATCH --output=logs/%x-%a.out          ### File in which to store job output
+#SBATCH --error=logs/%x-%a.err           ### File in which to store job error messages
 
-with open(output_filename, "w") as tf:
-    tf.write(str(sum_sort))
+#SBATCH --time=0-00:45:00                ### Wall clock time limit in Days-HH:MM:SS
+#SBATCH --nodes=1                        ### Number of nodes needed for the job
+#SBATCH --mem=4G                         ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
+#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
+#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
+
+#SBATCH --array=0-7
+
+srun python3 scripts/sum_eigh.py data/eigh-output-${SLURM_ARRAY_TASK_ID}.npy data/sum-eigh-${SLURM_ARRAY_TASK_ID}.npy
+sleep 10
 ```
 * `sort_eigh.py` - given a list of files as arguments, sums and sorts
 the input matrices, then writes that sum out to a file
@@ -629,7 +637,8 @@ with open(output_filename, "w") as tf:
     tf.write(str(sum_sort))
 ```
 
-Observe that `create_random.py` and `find_eigh.py` scripts operate indepedently,
+Observe that `create_random.py`, `find_eigh.py` and
+`sum_eigh.py` scripts operate indepedently,
 one matrix at a time. This means they can be easily parallelized by
 [array jobs](https://slurm.schedmd.com/job_array.html) in which each
 concurrent subjob gets its own CPU core and enough RAM to store the matrix.
@@ -641,8 +650,8 @@ otherwise our totals will be incorrect.
 ### Building the Pipeline: `sbatch` Scripts
 
 The goal of our pipeline is to make 8 1000x1000 matrices,
-compute their eigenvalues, sum those eigenvalues, then sort and sum
-those eigenvalues. 
+compute the eigenvalues of each matrix, sum the eigenvalues of each matrix, then sort the 8 eigenvalue sums in ascending
+order.
 
 This can be accomplished by running the following
 `sbatch` scripts in order, waiting for each stage to finish before 
@@ -741,9 +750,8 @@ srun python3 scripts/sum_eigh.py data/eigh-output-${SLURM_ARRAY_TASK_ID}.npy dat
 sleep 10
 ```
 
-This array job launches 8 subjobs, with each job summing up
-the eigenvalues at `sum-eigh-0.npy`, `sum-eigh-1.npy`...
-
+This array job launches 8 subjobs, with each job summing up each of the eigenvalues at eigh-ouput-0.npy, 
+eigh-ouput-1.npy... and storing the sums at sum-eigh-0.npy, sum-eigh-1.npy, and so on.
 
 Finally, inspect `sort_eigh.sbatch`.
 
@@ -773,7 +781,7 @@ sleep 10
 Unlike the previous jobs, this is *not* an array job. 
 Instead it uses Bash arguments to pass in a list of 
 files to the job. It launches a single job step that takes
-in *all* the files produced by `sum-eigh-` as input.
+in *all* the files produced by `sum-eigh.py` as input.
 
 ### Building Slurm Pipelines with Bash Scripts
 How do you go about running all these jobs? You could run
@@ -1186,13 +1194,25 @@ Conventionally, conda environments bundled with source code are named `environme
 
 The `conda env export` command [exports the environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#sharing-an-environment), which is written to `myenv-environment.yml`. 
 
+This will create a new file named `environment_R_4.4.1.yml` in your home directory.
+
 ```bash
 conda env export | sed '/prefix:/d' > environment_R_4.4.1.yml
 ```
 
-This will create a new file named `environment_R_4.4.1.yml` in your home directory.
+#### Prefix? `sed`?
+By default, when you export a conda environment with
+`conda env export`, the last line will include a prefix that lists 
+the directory where the environment was installed.
+This will not work for others who want to use the same file, because
+they won't have access to *your* home directory. 
+For example, mine would be `prefix: /home/emwin/.conda/envs/`.
 
-Inspect the contents of the environment file with `cat`.
+The [sed command](https://www.gnu.org/software/sed/manual/sed.html#Overview) 
+removes the prefix line from the created environment file 
+so that it can be used for another user to build a copy of the environment.
+
+Inspect the contents of the exported environment file with `cat`.
 
 ```bash
 cat environment_R_4.4.1.yml 
@@ -1321,6 +1341,11 @@ dependencies:
   - zlib=1.3.1=hb25bd0a_0
   - zstd=1.5.7=hb8e6e7a_2
 ```
+
+This environment file lists the precise versions
+of each installed package, giving
+`conda` detailed instructions on how to reconstruct an identical
+environment of the same name.
 
 ### Creating A Conda Environment from a .yml File
 Next, we will practice creating pre-defined Conda environments.

@@ -9,8 +9,8 @@ nav_order: 2
 
 # Configuration
 
-## Checking for the `jupyter-racs-s25` Conda Environment
-If you participated in the Advanced Slurm session, you should already have the `jupyter-racs-s25` environment available for today's activity. 
+## Checking for the `jupyter-racs-f25` Conda Environment
+If you participated in the Advanced Slurm session, you should already have the `jupyter-racs-f25` environment available for today's activity. 
 
 If you did not participate or want to make sure, connect to a Talapas login node through a shell application of your choice.
 For convenience, we recommend the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
@@ -135,5 +135,13 @@ After clicking, you will be prompted to select a specific Python kernel.
 After selecting a kernel, open the `jupyter_examples` folder in your home directory [from within the JupyterLab interface](https://jupyterlab.readthedocs.io/en/stable/user/files.html).
 
 ## Exercise Notebooks
+
+Copy the following folder to your home directory.
+```bash
+cp -r /projects/racs_training/intro-hpc-f25/jupyter-class/ .
+```
+
+You can either reference raw notebooks from this folder or the annotated
+versions below.
 
 Today's lesson continues in the [Notebooks](../jupyterlab/notebooks.html) section.
