@@ -1,7 +1,7 @@
 ---
 title: Jupyter Activities
-permalink: /jupyterlab/notebooks.html
-parent: JupyterLab on Talapas
+permalink: /ondemand/notebooks.html
+parent: OnDemand Apps
 layout: post
 nav_enabled: true
 nav_order: 3

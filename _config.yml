@@ -1,4 +1,4 @@
-title: Talapas Workshop Archive
+title: Intro HPC @ UO
 description: Talapas Resources and Lesson Materials
 theme: just-the-docs
 
@@ -8,7 +8,7 @@ color_scheme: uo
 aux_links:
   Talapas Support: https://hpcrcf.atlassian.net/servicedesk/customer/portal/1
   Talapas Documentation: https://uoracs.github.io/talapas2-knowledge-base/
-  Data Services Consults: https://uoregon.libcal.com/appointments/data_services
+  Individual Consultations: https://uoregon.libcal.com/appointments/data_services
 
 ga_tracking: G-5SQ751NSV8
 ga_tracking_anonymize_ip: true

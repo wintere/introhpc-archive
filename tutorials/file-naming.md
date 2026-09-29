@@ -2,7 +2,7 @@
 title: Filename Best Practices
 layout: page
 permalink: /tutorials/filenames.html
-parent: Tutorials and Resources
+parent: Related Resources
 nav_enabled: true
 nav_order: 1
 ---

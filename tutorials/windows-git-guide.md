@@ -4,7 +4,7 @@ layout: post
 permalink: /tutorials/windows-git.html
 nav_enabled: true
 nav_order: 2
-parent: Tutorials and Resources
+parent: Related Resources
 ---
 
 # Windows Git Installation Guide
