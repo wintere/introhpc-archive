@@ -2,12 +2,12 @@
 title: Lesson
 layout: page
 permalink: /bash/lesson.html
-parent: Introduction to Bash
+parent: Bash and the Command Line
 nav_enabled: true
 published: true
 nav_order: 3
 ---
-# Day One: Introduction to Bash and HPC
+# Day One: Bash and the Command Line
 {: .no_toc }
 This lesson is adapted from *[The Unix Shell](https://swcarpentry.github.io/shell-novice/aio.html)* lesson of Software Carpentry.
 - TOC
