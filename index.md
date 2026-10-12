@@ -7,19 +7,16 @@ nav_order: 1
 <img src="./images/hpclogo.png" alt="drawing" width="300"/>
 
 ## Introduction to High-Performance Computing
-UO Libraries, Research Advanced Computer Services (RACS), and the Lewis Center for Neuroimaging are pleased to announce our Introduction to High Performance Computing workshop series!
-This workshop is held in-person in the Knight Library DREAM Lab.
+This workshop series prepares attendees to use Talapas, UO's supercomputer. Designed with researchers in mind, this series introduces UNIX commands, bash scripting, environment management, OnDemand, Slurm, parallelization, and other essential Talapas skills.
 
-Targeted towards computational researchers, these workshops will introduce UNIX commands, bash scripting, file management, OnDemand, Slurm, PIRGs, JupyterLab integration, job management, and other essential Talapas skills. 
+This webpage archives notes, slides, and code samples from the workshop series. Pardon our mess as we reorganize the site for Fall 2026!
 
-This webpage archives notes, slides, and code samples from the workshop series. Excuse the mess as we refactor for Spring 2025!
-
-## Spring 2025 Schedule
-* [**Why HPC, Introduction to Bash:**](./bash/main.html) May 12th, 2pm - 4pm
-* [**Bash Scripting on Talapas:**](./talapas-scripting/main.html) May 14th, 2pm - 4pm
-* [**Talapas Essentials:**](./talapas-essentials/main.html) May 19th, 2pm - 4pm
-* [**Running Slurm Jobs on Talapas:**](./slurm/main.html) May 21st, 2pm - 4pm
-* [**Advanced Slurm:**](./advanced-slurm/main.html) May 28th, 2pm - 4pm
-* **JupyterLab on Talapas:** June 2nd, 2pm - 4pm
+## Fall 2026 Schedule
+* [**Introduction to Bash and HPC:**](./bash/main.html) October 13th, 1pm—3pm
+* [**Bash Scripting on Talapas:**](./talapas-scripting/main.html) October 15th, 1pm—3pm
+* [**Talapas Essentials:**](./talapas-essentials/main.html) October 20th, 1pm—3pm
+* [**Running Jobs with Slurm:**](./slurm/main.html) October 22nd, 1pm—3pm
+* [**Running Workflows on Talapas:**](./workflows/main.html) October 27th, 1pm—3pm
+* [**OnDemand Apps and JupyterLab:**](./ondemand/main.html) October 29th, 1pm—3pm
 
 This page is maintained by [Erin M. Winter](https://library.uoregon.edu/directory/winter) of UO Libraries.
