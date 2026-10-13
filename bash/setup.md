@@ -15,12 +15,16 @@ This workshop is designed to teach Bash commands and key filesystem concepts to 
 Do not worry too much about these distinctions! Lessons after this point will be conducted through terminals connected to Talapas, a RedHat Linux cluster. The differences among laptops is less relevant when everyone is on the same cluster. 
 
 ### Windows
-Because Windows is not a UNIX-based operating system, Windows computers do not come with a Unix shell. For teaching purposes, Windows participants will rely on an emulator included with Git called Git Bash. 
+Because Windows is not a UNIX-based operating system, Windows computers do not come with a Unix shell. For teaching purposes, Windows participants will rely on an emulator included with Git called Git Bash. Windows users who have [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/) installed are encouraged to use it, but it is not a requirement for this class.
 
 To start, download [Git](https://git-scm.com/downloads), install it, and open the Git Bash application from your Start Menu, which emulates a Bash shell on a Windows operating system. Need help with the install steps? I have [included a screen-by-screen guide]({% link tutorials/windows-git-guide.md %})
 
 ### MacOS
-Open the Terminal application by searching for "Terminal" in Spotlight Search. The default shell [Zsh](https://support.apple.com/en-us/102360) will run all of the Bash commands in this lesson.
+Open the Terminal application by searching for "Terminal" in Spotlight Search. The default shell [Zsh](https://support.apple.com/en-us/102360) will run all of the Bash commands in this lesson. You can launch a Bash shell by typing the following and pressing <kbd>Enter</kbd> in your terminal.
+
+```bash
+bash
+```
 
 ### Linux 
 Open the Terminal application by searching for "Terminal" in the Applications menu. On popular deployments like Ubuntu, Fedora, and Debian, the default shell is Bash. 

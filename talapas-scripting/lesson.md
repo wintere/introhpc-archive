@@ -84,7 +84,7 @@ hostname
 login2.talapas.uoregon.edu
 ```
 
-As expected, we are on one of the login nodes. There are four login or "head" nodes for Talapas numbered `login1`, `login2`, `login3`, and `login4` respectively.
+As expected, we are on one of the login nodes. There are three login or "setup" nodes for Talapas numbered `login1`, `login2`, and `login3` respectively.
 
 You can `ssh` to `login.talapas.uoregon.edu` to let special load balancer decide which login node connect to
 instead of selecting a particular node. 
@@ -655,10 +655,6 @@ There are no `Male` animals in the study, but the `-i` searches with case-insens
 
 Grep can be very useful, and I would recommend reading over its `man` page to play around with some of the options.
 
-`man grep` (MacOS)
-
-`grep --help` (Git Bash/Windows)
-
 Grep is a great way to quickly make sense of a large file or large set of data. You can even use it to search the outputs of other commands.
 
 ### Managing Command History: `history`
@@ -673,7 +669,7 @@ history
 
 #### Quiz
 {: .no_toc }
-How can we use `|` and `grep` and `wc` to count how many times you've typed the command `pwd` on Talapas today?
+How can we use `|` and `grep` and `wc` to count how many times you've typed the command `pwd` on Talapas so far?
 
 #### Answer
 {: .no_toc }

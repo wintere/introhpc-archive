@@ -11,16 +11,13 @@ This lesson is adapted from the *[Connecting to the remote HPC System](https://w
 
 ## What is an SSH Key?
 SSH keys are a method for authentication for command line access to remote computing systems. 
-After creating an SSH key on a given device, you likely won't need to 
-create another one.
 
 SSH keys can also be used for authentication when transferring files from shared servers or for accessing version control systems like GitHub. 
 
-In this section you will create a pair of SSH keys, a private key which you keep on your own computer and a public key which is placed on the remote HPC system that you will log in to.
+In this section you will create a pair of SSH keys, a private key which you keep on your own computer and a public key which can be copied to Talapas. 
 
 ### A Note on OS Compatibility
-If you installed Git Bash using my [recommended instructions]({% link tutorials/windows-git-guide.md %}, you should have access all the ssh key generation commands that your UNIX classmates have through Git Bash. 
-You should not need to install any additional software.
+If you installed Git Bash using my [recommended instructions]({% link tutorials/windows-git-guide.md %}, you should have access to the necessary commands.
 
 If something doesn't work as intended, please raise your hand!
 
@@ -28,11 +25,11 @@ If something doesn't work as intended, please raise your hand!
 Those of you who have used platforms like GitHub before may have
 created an SSH key without realizing you had done so.
 
-SSH keys are their associated configurations are typically stored 
+SSH keys are their associated configuration files are typically stored 
 in a hidden folder called `.ssh` in your your home directory.
 
 Hidden folders are hidden from GUIs like File Explorer and Finder by default. 
-To see them you must either change how your GUI displays files or use the special `-a` flag with commands like `ls`.
+To see them, you must either change how your GUI displays files or use the special `-a` flag with commands like `ls` inside the terminal.
 
 ```bash
 ls -aF ~
@@ -51,20 +48,25 @@ ls ~/.ssh/
 ```
 
 If you've created an SSH key before, you'll have a list of text files that look something like this.
-ed25519 refers to cryptographic algorithm for generating SSH key pairs, so `id_ed25519` is the default name for SSH keys generated using that tool.
+
 ```output
 config      id_ed25519.pub  known_hosts.old  
 id_ed25519  known_hosts     
 ```
-If you have two files named `id_ed25519.pub` and `id_ed25519` respectively, wait. Skip to the `Add your SSH Key to Talapas` step.
+
+The `ed25519` portion refers to a cryptographic algorithm for generating SSH key pairs, so `id_ed25519` is the default name for SSH keys generated using that tool.
+
+If you have two files named `id_ed25519.pub` and `id_ed25519` respectively, skip to the `Add your SSH Key to Talapas` step.
+
 If you do *not* have any files with `.pub` suffix (no public/private key pair) continue to the key generation step.
 
 ## No SSH Key Pair? Create One
 From your terminal run the following command: 
+
 ```bash
 ssh-keygen -t ed25519 -C "[YOURDUCKID]@uoregon.edu"
 ```
-This creates a new SSH key with the ed25519 algorithm, using your UOregon (presumably professional) email as a label.
+This creates a new SSH key using your UOregon email as a label.
 
 ```ouput
 > Generating public/private ALGORITHM key pair.
@@ -81,16 +83,15 @@ You will then prompted to enter an optional passphrase for your SSH key.
 > Enter passphrase (empty for no passphrase): [Type a passphrase]
 > Enter same passphrase again: [Type passphrase again]
 ```
-To leave your SSH key without a passphrase, type **Enter** twice more.
 
 ## Add Your SSH Key to Talapas
 
-At this point, all of you should be ready to connect to Talapas. Type the following command into your terminal application.
+At this point, you should be ready to connect to Talapas. Type the following command into your terminal application.
 
 ```bash
 ssh [yourDuckID]@login1.talapas.uoregon.edu
 ```
-If this is your first time connecting to Talapas through SSH, you will be prompted with a long, unwieldy message that ends with this line.
+If this is your first time connecting to Talapas through SSH, you will be prompted with a message like this.
 
 ```ouput
 The authenticity of host 'login1.talapas.uoregon.edu (128.223.192.241)' can't be established.
@@ -101,8 +102,8 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 
 Type `yes` (lowercase) and press **Enter** to dismiss the message. You will not prompted with it again unless you change devices or create a new SSH key.
 
-In the future, feel free to use any of the 4 login nodes or to choose the load balancer at `login.talapas.uoregon.edu`. For today, let's
-all log on to the same node: `login1.talapas.uoregon.edu`.
+In the future, feel free to use any of the 3 login nodes or to choose the load balancer at `login.talapas.uoregon.edu`. For today, let's
+all log on to the same node: `login2.talapas.uoregon.edu`.
 
 ![example Talapas welcome message](../images/talapas-welcome.JPG) *An example Talapas welcome message*
 
@@ -120,7 +121,7 @@ To reduce the number of Duo 2FA prompts, you can take the following steps:
 3. Add your SSH public key to the `~/.ssh/authorized_keys` file on Talapas.
 
 ```bash
-ssh-copy-id -i ~/.ssh/id_ed25519.pub [yourDuckID]@login1.talapas.uoregon.edu
+ssh-copy-id -i ~/.ssh/id_ed25519.pub [yourDuckID]@login2.talapas.uoregon.edu
 ```
 
 ```output
@@ -134,7 +135,7 @@ Number of key(s) added: 1
 Next, check that your key has been added to the `authorized_keys` file on Talapas.
 
 ```bash
-ssh [yourDuckID]@login1.talapas.uoregon.edu
+ssh [yourDuckID]@login2.talapas.uoregon.edu
 cat ~/.ssh/authorized_keys
 ```
 You should see something like this if your key has been successfully added.

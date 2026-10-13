@@ -24,9 +24,11 @@ You have probably interacted with your device's filesystem through GUI  or graph
 ![A screenshot of the same folder contents from a textual ](../images/command-line.png) *A screenshot of the same folder contents as they appear from the command line.*
 
 To work with high performance-computing systems like Talapas, you will need to interact with files and folders from a shell application called the command line, command prompt, or terminal interchangeably. 
-The language to communicate with this shell application is called Bash.
 
-Today's Bash commands are used to create, inspect, rename, and delete files and directories. To start exploring them, move to the Git Bash or Terminal application that you opened during the workshop setup.
+The language we used to communicate with this shell application is called Bash.
+
+Today's Bash commands are used to create, inspect, rename, and delete files and directories. These are essential
+concepts for high-performance computing.
 
 ## Where Are You? `pwd, cd, ls`
 
@@ -34,7 +36,7 @@ For today's lesson, we will focus on running Bash commands *locally* on your own
 
 ### A Note on Example Commands
 {: .no_toc }
-> I have tested the commands in this workshop on a Windows computer with Git Bash installed. This means that my output paths typically begin with `/c/users/erin` rather than `/users/erin`. 
+> I have tested the commands in this workshop on a Windows computer with Git Bash installed. 
 
 ### Entering Bash Commands
 {: .no_toc }
@@ -48,25 +50,27 @@ The simplest form of Bash's grammar is a single command or program terminated by
 {: .no_toc }
 Our first Bash command is `pwd`, which stands for **p**rint **w**orking **d**irectory.
 
+The expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
+
+* **Windows:** `/c/users/yourname` (Git Bash)
+* **Mac OS:** `/Users/yourname/`
+* **Linux:** `/home/yourname/`
+
 
 ```bash
 pwd
 ```
-
-Because terminal applications typically open to your home directory by default, the expected output is the absolute path of your *home directory*, which will vary based on your operating system and your account name. 
-
 ```output
-/c/Users/Erin
+/c/users/erin
 ```
 
 This command returns the *absolute path* of the current working directory. All relative file and folder paths used as arguments must be **relative to the current working directory**.
+
 
 ### Home Directory Structure
 {: .no_toc }
 
 Each of you will have a different set of files and folders inside your home directory, which would make it difficult for interactive exercises. However, we're going to practice Bash commands from inside the `talapas-bash` folder you extracted from `talapas-bash.zip`.
-
-You should have a folder `/users/home/[YOURNAME]/talapas-bash/` (Unix) or `/c/users/Home/[YOURNAME]/talapas-bash/`(Git Bash) with a set of practice subfolders and files. 
 
 *Please ask for assistance at this point if you need help moving and extracting the`talapas-bash.zip` file.*
 
@@ -105,11 +109,11 @@ books/  exercise-data/  scripts/
 ```
 
 
-`ls` is also the first command that we will use with options. 
+`ls` is also the first command that we will use with options.
 
 **Options** are letters signaled by a hyphen that are passed to commands to change the behavior of that command.
 
- Type `ls -l` with a <kbd>-</kbd> (hyphen) key. Options must come *after* the command they modify and *without space* between the hyphen and the letter representing the option.
+ Type `ls -l` with a <kbd>-</kbd> (hyphen) key. Options must come *after* the command they modify and *without space* between the hyphen and the letter representing the option. 
 
 ```bash
 ls -l
@@ -472,10 +476,7 @@ Use the **arrow keys** to scroll through the text and the <kbd>Q</kbd>-key to ex
 
 
 By default, `mv` will not ask for confirmation before overwriting files.
-However, an additional option, `mv -i` (or `mv --interactive`), will cause `mv` to request
-such confirmation.
-
-Note that `mv` also works on directories.
+However, an additional option, `mv -i` (or `mv --interactive`), will cause `mv` to request confirmation.
 
 Let's move `wisdom.txt` into the current working directory `writing`.
 
@@ -718,7 +719,7 @@ It is the shell itself that expands the wildcards.
 Let's look more closely at the `alkanes` folder
 that contains six files describing some simple organic molecules.
 
-The `.pdb` extension indicates that these files are in Protein Data Bank format, a simple text format that specifies the type and position of each atom in the molecule.
+The `.pdb` extension indicates that these files are in Proton Data Bank format, a simple text format that specifies the type and position of each atom in the molecule.
 
 ```bash
 $ ls
@@ -802,7 +803,7 @@ The `-m` and `-w` options can also be used with the `wc` command to show only th
 
 ## Writing Output to Files: `>` and `>>`
 
-Which of these protein database files contains the fewest lines?
+Which of these proton database files contains the fewest lines?
 It's an easy question to answer when there are only six files,
 but what if there were 6000?
 Our first step toward a solution is to run the command:
