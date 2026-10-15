@@ -922,6 +922,48 @@ This tells us that `methane.pdb` is the shortest of the files, with only 9 lines
 
 Using `-n 1` with `head` tells it that we only want the first line of the file; `-n 20` would get the first 20, and so on.
 
+### Warning: Redirecting to the same file
+{: .no_toc }
+
+It's a very bad idea to try redirecting
+the output of a command that operates on a file
+to the same file. For example:
+
+```bash
+sort -n lengths.txt > lengths.txt
+```
+
+Doing something like this may give you
+incorrect results and/or delete the contents of `lengths.txt`. *Do not actually run this command.*
+
+
+### Peeking at the Bottom with `tail`
+{: .no_toc }
+
+The last `head` command, which prints the first few lines of a text file. 
+By default it prints the first 10, but we can use the -n flag followed by a number to indicate how many lines we want to print.
+```bash
+head -n 1 sorted-lengths.txt
+```
+
+```out
+9 methane.pdb
+```
+
+`tail` is similar, but prints it lines from the end of a file instead.
+
+If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and the total lengths of all the `.pdb` files instead.
+
+```bash
+tail -n 2 sorted-lengths.txt
+```
+
+```output
+  30 octane.pdb
+ 107 total
+```
+
+
 ### Waiting for Input...
 {: .no_toc }
 
@@ -983,8 +1025,10 @@ As we wrap up for the day, let's clear the text that has been printed to the ter
 | wc [filename] | prints line, word, and char counts | wc list.txt |
 | cat [filename] | prints the contents of a file to the screen | cat list.txt |
 | command > [filename] | redirects the output of a command to file | ls > files.txt |
+| command >> [filename] | append the output of a command to file | ls >> log.txt |
 | sort [filename] | sorts the lines of a file | sort -n rows.csv |
 | head -n [# lines] [file] | print the first # lines of a file or files | head -n long-novel.txt |
+| tail -n [# lines] [file] | print the last n lines of a file or files | tail -n long-novel.txt |
 | clear | clears the terminal screen (not the history) | clear |
 
 ## Learn More About Bash

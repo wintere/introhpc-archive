@@ -102,7 +102,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 
 Type `yes` (lowercase) and press **Enter** to dismiss the message. You will not prompted with it again unless you change devices or create a new SSH key.
 
-In the future, feel free to use any of the 3 login nodes or to choose the load balancer at `login.talapas.uoregon.edu`. For today, let's
+In the future, feel free to use any of the 4 login nodes or to choose the load balancer at `login.talapas.uoregon.edu`. For today, let's
 all log on to the same node: `login2.talapas.uoregon.edu`.
 
 ![example Talapas welcome message](../images/talapas-welcome.JPG) *An example Talapas welcome message*

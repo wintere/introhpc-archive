@@ -84,7 +84,7 @@ hostname
 login2.talapas.uoregon.edu
 ```
 
-As expected, we are on one of the login nodes. There are three login or "setup" nodes for Talapas numbered `login1`, `login2`, and `login3` respectively.
+As expected, we are on one of the login nodes. There are four login or "setup" nodes for Talapas numbered `login1`, `login2`, `login3`, and `login4` respectively.
 
 You can `ssh` to `login.talapas.uoregon.edu` to let special load balancer decide which login node connect to
 instead of selecting a particular node. 
@@ -120,104 +120,6 @@ If you see a name twice, someone has multiple open terminals
 connected to Talapas right now. This is a common use case for
 users who might need to manage code in one filesystem location
 and inspect outputs in another.
-
-## Unix Permissions
-Now that we're on Talapas, let's do an ls command with the long-listing argument and a human readable flag. 
-
-I want to take this opportunity to talk about UNIX permissions now that we're all on machines with the same operating system. 
-Because software **cannot manipulate open, write or execute files without permission to do so for each file**, permissions are a common source of code failures on shared filesystems.
-
-Though many of you come from different labs, we all share a *racs_training* PIRG. That means, everyone should have access to the shared `racs_training` folder located in `/projects/racs_training`. Let's examine the permissions of a certain file in the `racs_training` folder.
-
-```bash
-ls -lh /projects/racs_training/intro-hpc-s25/emw/greeting.txt
-```
-
-```output
--rwxr--r--. 1 emwin is.racs.pirg.racs_training 29 May 13 16:06 /projects/racs_training/intro-hpc-s25/emw/greeting.txt
-```
-
-It's time to unpack results from the `-l` or long listing flag. Let's see if we can understand **what each field of a given row represents**,
-working left to right.
-
-1. **Permissions:** On the very left side, there is a string of the characters
-   `d`, `r`, `w`, `x`, and `-`. The `d` indicates if something is a directory
-   (there is a `-` in that spot if it is not a directory). The other `r`, `w`,
-   `x` bits indicate permission to **R**ead, **W**rite, and e**X**ecute a file.
-   There are three fields of `rwx` permissions following the spot for `d`. If a
-   user is missing a permission to do something, it's indicated by a `-`.
-   - The first set of `rwx` are the permissions that the owner of the file has.
-   - The second set of `rwx`s are permissions that members of the file's
-     group share (in this case, the group is named `racs_training`).
-   - The third set of `rwx`s are permissions for everyone else not in the group. 
-2. **References:** This counts the number of references ([hard
-   links](https://en.wikipedia.org/wiki/Hard_link)) to the item (file, folder,
-   symbolic link or "shortcut").
-3. **Owner:** This is the username of the user who owns the file. Their
-   permissions are indicated in the first permissions field.
-4. **Group:** This is the PIRG (racs_training) associated with the file. Members of
-   this user group have permissions indicated in the second permissions field.
-5. **Size of item:** This is the number of bytes in a file, in human-readable form thanks to the -h flag.
-6. **Time last modified:** This is the last time the file was modified.
-7. **Filename:** Filename.
-
-Group membership is very important on Talapas, because it is configured such that research groups cannot see each other's data. It's also configured such that your home directory's data is private to you.
-
-For example, you can open files I've created within the racs_training project directory because this file has **read** permissions enabled for members of the racs_training PIRG.
-
-Some labs have more complicated permissions hiearchies implemented in their ACL groups, but those will be covered
-in the Talapas-specific lesson.
-
-We should all be able to `cat` this file to the terminal.
-```bash
-cat /projects/racs_training/intro-hpc-s25/emw/greeting.txt
-```
-
-```output
-Is this the first file you've looked at on Talapas?
-```
-
-We can't run the `ls` or `cat` command on files and folders we don't have permission to read. For example, I'll get a permissions error if I try to list the contents of someone else's home directory.
-
-```bash
-ls /home/ghayden/
-```
-
-```output
-ls: cannot open directory '/home/ghayden': Permission denied
-```
-
-Note that, even if there were files in Gabriele's home directory that *were* readable by anyone, I could not read them because I cannot traverse into her home directory.
-
-To share a file or directory that you own with someone in your PIRG, you can grant read and execute privileges for them within the shared `/project/[pirg_name]` directory. However, you must also set the same privileges on any parent directories above the item you're sharing. The execute bit for directories controls whether or not the folder can be **traversed**. Without execute permissions, you cannot see the child folders and files of folders you can otherwise read.
-
-The best place to share files are in folders that are shared by your research group, like a project `/projects/[pirg_name]/` directory.
-
-#### Quiz
-{: .no_toc }
-On websites like StackOverflow, you may advised to use the command `chmod 777` or `chmod -R 777` to alter the permissions of shared input files.
-Test this theory on an empty file in your home directory.
-
-```bash
-touch the-universal-file.txt
-chmod 777
-```
-What does this do? Why is this such a bad idea on shared filesystems?
-
-#### Answer
-{: .no_toc }
-Use `ls -lh` to examine how the permissions on the file have changed.
-```bash
-ls -lh the-universal-file.txt
-```
-
-```output
--rwxrwxrwx. 1 emwin uoregon 0 Feb  5 11:21 the-universal-file.txt
-```
-
-This is a bad idea because it grants read, write, and execute permissions to **all** users for the file. 
-In the majority of cases, your problems can be solved by giving **group** read access using  to files and execute access on folders for your colleagues traversal. 
-
 
 ## Transferring Files to and from Talapas with `scp`
 
@@ -265,13 +167,13 @@ talapas-bash.zip                              100% 7187KB   5.4MB/s   00:01
 
 #### Quiz
 {: .no_toc }
-How would I copy the `/projects/racs_training/intro-hpc-s25/emw/greeting.txt` file to my home directory on my laptop using `scp`? (Use auto-complete on this lengthy path.)
+How would I copy the `/projects/racs_training/intro-hpc-f26/talapas-scripting/greeting.txt` file to my home directory on my laptop using `scp`? (Use auto-complete on this lengthy path.)
 
 **Hint**: Remember what the `.` character means?
 #### Answer
 {: .no_toc }
 ```bash
-scp [yourDuckID]@login2.talapas.uoregon.edu:/projects/racs_training/intro-hpc-s25/emw/greeting.txt .
+scp [yourDuckID]@login2.talapas.uoregon.edu:/projects/racs_training/intro-hpc-f26/talapas-scripting/greeting.txt .
 ```
 
 ```output
@@ -374,48 +276,6 @@ We wrote the output of this command to `sorted-lengths.txt`.
 
 ```bash
 sort -n lengths.txt > sorted-lengths.txt
-```
-
-
-### Warning: Redirecting to the same file
-{: .no_toc }
-
-It's a very bad idea to try redirecting
-the output of a command that operates on a file
-to the same file. For example:
-
-```bash
-sort -n lengths.txt > lengths.txt
-```
-
-Doing something like this may give you
-incorrect results and/or delete the contents of `lengths.txt`. *Do not actually run this command.*
-
-
-### Peeking at the Bottom with `tail`
-{: .no_toc }
-
-The last `head` command, which prints the first few lines of a text file. 
-By default it prints the first 10, but we can use the -n flag followed by a number to indicate how many lines we want to print.
-```bash
-head -n 1 sorted-lengths.txt
-```
-
-```out
-9 methane.pdb
-```
-
-`tail` is similar, but prints it lines from the end of a file instead.
-
-If we look at the last two lines of sorted-lengths.txt using `tail -n 2 sorted-lengths.txt`, we get the longest and the total lengths of all the `.pdb` files instead.
-
-```bash
-tail -n 2 sorted-lengths.txt
-```
-
-```output
-  30 octane.pdb
- 107 total
 ```
 
 ## Accumulating Text: `>>` and `echo`
@@ -800,6 +660,105 @@ find . -name '*.md'
 
 This returns only files that end in `.md`. Quoting is very important here, as [Bash treats single-quotes and double-quotes differently](https://www.gnu.org/software/bash/manual/html_node/Quoting.html).
 
+## Unix Permissions
+Now that we're on Talapas, let's do an ls command with the long-listing argument and a human readable flag. 
+
+I want to take this opportunity to talk about UNIX permissions now that we're all on machines with the same operating system. 
+Because software **cannot manipulate open, write or execute files without permission to do so for each file**, permissions are a common source of code failures on shared filesystems.
+
+Though many of you come from different labs, we all share a *racs_training* PIRG. That means, everyone should have access to the shared `racs_training` folder located in `/projects/racs_training`. Let's examine the permissions of a certain file in the `racs_training` folder.
+
+```bash
+ls -lh /projects/racs_training/intro-hpc-f26/talapas-scripting/read-only.txt
+```
+```output
+-rw-r--r--. 1 emwin is.racs.pirg.racs_training 2.9M Oct 15 09:36 /projects/racs_training/intro-hpc-f26/talapas-scripting/read-only.txt
+```
+
+It's time to unpack results from the `-l` or long listing flag. Let's see if we can understand **what each field of a given row represents**,
+working left to right.
+
+1. **Permissions:** On the very left side, there is a string of the characters
+   `d`, `r`, `w`, `x`, and `-`. The `d` indicates if something is a directory
+   (there is a `-` in that spot if it is not a directory). The other `r`, `w`,
+   `x` bits indicate permission to **R**ead, **W**rite, and e**X**ecute a file.
+   There are three fields of `rwx` permissions following the spot for `d`. If a
+   user is missing a permission to do something, it's indicated by a `-`.
+   - The first set of `rwx` are the permissions that the owner of the file has.
+   - The second set of `rwx`s are permissions that members of the file's
+     group share (in this case, the group is named `racs_training`).
+   - The third set of `rwx`s are permissions for everyone else not in the group. 
+2. **References:** This counts the number of references ([hard
+   links](https://en.wikipedia.org/wiki/Hard_link)) to the item (file, folder,
+   symbolic link or "shortcut").
+3. **Owner:** This is the username of the user who owns the file. Their
+   permissions are indicated in the first permissions field.
+4. **Group:** This is the PIRG (racs_training) associated with the file. Members of
+   this user group have permissions indicated in the second permissions field.
+5. **Size of item:** This is the number of bytes in a file, in human-readable form thanks to the -h flag.
+6. **Time last modified:** This is the last time the file was modified.
+7. **Filename:** Filename.
+
+Group membership is very important on Talapas, because it is configured such that research groups cannot see each other's data. It's also configured such that your home directory's data is private to you.
+
+For example, you can open files I've created within the racs_training project directory because this file has **read** permissions enabled for members of the racs_training PIRG.
+
+Some labs have more complicated permissions hiearchies implemented in their ACL groups, but those will be covered
+in the Talapas-specific lesson.
+
+We should all be able to `cat` this file to the terminal.
+
+```bash
+cat /projects/racs_training/intro-hpc-f26/talapas-scripting/read-only.txt
+```
+```output
+This is a read-only file.
+You (a group member) can't change it!
+But the owner (emwin) can
+```
+
+We can't run the `ls` or `cat` command on files and folders we don't have permission to read. For example, I'll get a permissions error if I try to list the contents of someone else's home directory.
+
+```bash
+ls /home/ghayden/
+```
+
+```output
+ls: cannot open directory '/home/ghayden': Permission denied
+```
+
+Note that, even if there were files in Gabriele's home directory that *were* readable by anyone, I could not read them because I cannot traverse into her home directory.
+
+To share a file or directory that you own with someone in your PIRG, you can grant read and execute privileges for them within the shared `/project/[pirg_name]` directory. However, you must also set the same privileges on any parent directories above the item you're sharing. The execute bit for directories controls whether or not the folder can be **traversed**. Without execute permissions, you cannot see the child folders and files of folders you can otherwise read.
+
+The best place to share files are in folders that are shared by your research group, like a project `/projects/[pirg_name]/` directory.
+
+#### Quiz
+{: .no_toc }
+On websites like StackOverflow, you may advised to use the command `chmod 777` or `chmod -R 777` to alter the permissions of shared input files.
+Test this theory on an empty file in your home directory.
+
+```bash
+cd ~
+touch the-universal-file.txt
+chmod 777
+```
+What does this do? Why is this such a bad idea on shared filesystems?
+
+#### Answer
+{: .no_toc }
+Use `ls -lh` to examine how the permissions on the file have changed.
+```bash
+ls -lh the-universal-file.txt
+```
+
+```output
+-rwxrwxrwx. 1 emwin uoregon 0 Feb  5 11:21 the-universal-file.txt
+```
+
+This is a bad idea because it grants read, write, and execute permissions to **all** users for the file. 
+In the majority of cases, your problems can be solved by giving **group** read access using  to files and execute access on folders for your colleagues traversal. 
+
 ## Bash Scripts
 
 We've been running increasingly complicated commands, and it's time to think about putting them into a script to make them reusable.
@@ -831,7 +790,7 @@ hello.sh
 ```
 
 You could choose to execute it using `source hello.sh`, which is much like running `python3 myfile.py` or `Rscript myscript.R` on Python and R scripts respectively. 
-The `source` command tells the shell to execute each line of a text file as a sequence of commands.
+The `source` command tells the current shell to execute each line of a text file as a sequence of commands.
 
 ```bash
 source hello.sh
@@ -859,7 +818,7 @@ For our next exercise, move to the `talapas-bash` parent directory.
 
 `cd ~/talapas-bash`
 
-Now, let's write a script that uses the `find` command to find files that end in `.txt` in the exercise-data` directory.
+Now, let's write a script that uses the `find` command to find files that end in `.txt` in the `exercise-data` directory.
 
 ```bash
 nano find-text.sh
@@ -868,6 +827,7 @@ nano find-text.sh
 ```bash
 #!/bin/bash
 find exercise-data -name '*.txt'
+echo 'Done!'
 ```
 
 Let's run it to see if it works.
@@ -889,6 +849,7 @@ exercise-data/writing/journal/day1.txt
 exercise-data/writing/journal/day2.txt
 exercise-data/writing/haiku.txt
 exercise-data/writing/thesis/quotations.txt
+Done!
 ```
 
 It works, so let's move it to that scripts directory we already have.
@@ -944,6 +905,7 @@ We're going to replace `exercise-data` with a special symbol that indicates an *
 ```bash
 #!/bin/bash
 find "$1" -name '*.txt'
+echo 'Done!'
 ```
 
 Inside a Bash script, `$1` means the first filename (or other argument) on the command line. 
@@ -960,6 +922,7 @@ We can now run our script like this on an arbitrary directory like `mice` instea
 ../exercise-data/mice/Tasks.txt
 ../exercise-data/mice/Animals.txt
 ../exercise-data/mice/Visit.txt
+Done!
 ```
 
 To reference additional arguments, use `$2`, `$3` and so on. 
@@ -974,7 +937,7 @@ you can change how the shell and other programs behave.
 Every variable has a name.
 By convention, variables that are always present (constants) are given upper-case names.
 
-Let's show the value of the variable `HOME`, or the path of *your* home directory:
+Let's show the value of the *environment variable* `HOME`, or the path of *your* home directory:
 
 ```bash
 echo HOME
@@ -1005,7 +968,7 @@ echo $HOSTNAME
 login2.talapas.uoregon.edu
 ```
 
-To set our own variables for a given terminal session, we can use the following syntax:
+To set our own variables for the current terminal session, we can use the following syntax:
 
 ```bash
 FAMILY_PET='Scout'
@@ -1017,7 +980,6 @@ Scout
 ```
 
 ## Stdout, Stderr
-
 Thus far, you have learned to run Bash commands in which output is either directed to
 stdout, the terminal, or [redirected](https://www.gnu.org/software/bash/manual/html_node/Redirections.html?ref=vegastack.com) to a file.
 
@@ -1029,7 +991,7 @@ Stderr, by default, is a separate stream from stdout, even though it prints to t
 Let's navigate back to the `talapas-bash` directory and do a quick `ls`.
 
 ```bash
-cd
+cd ~/talapas-bash
 ls
 ```
 
@@ -1105,11 +1067,11 @@ Let's copy a certain folder from the `racs_training` folder to your home directo
 Use the tab auto-complete feature to help you!
 
 ```bash
-cp -r /projects/racs_training/intro-hpc-s25/emw .
+cp -r /projects/racs_training/intro-hpc-f26/talapas-scripting .
 cd emw
 ```
 
-If you look inside your copy of the `emw` directory, you'll see a script called `a-slow-script.sh`.
+If you look inside your copy of the `talapas-scripting` directory, you'll see a script called `a-slow-script.sh`.
 
 Use `cat` to print it to the terminal.
 
@@ -1387,8 +1349,6 @@ We will dive deeper into this topic next week!
 | unzip [zip folder] | unzip zipped folder | unzip example.zip |
 | chmod [permissions] [file or folder] | give permissions to users or groups for file | chmod -R g+rwx ShareInputs |
 | sort [file] | sort lines within a file or input buffer | sort -n ids.txt |
-| head -n [# lines] [file] | print the first n lines of a file or files | head -n long-novel.txt |
-| tail -n [# lines] [file] | print the last n lines of a file or files | tail -n long-novel.txt |
 | echo [string] | print textual input to terminal | echo "echo echo echo" |
 | [cmd] > [file] | redirect output of [cmd] to file | echo "Hello" > file.txt |
 | [cmd] >> [file] | concatenate redirected output of [cmd] to file | echo "Another Line" >> file.txt |
