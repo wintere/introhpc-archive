@@ -36,7 +36,7 @@ CPU and GPU hardware is periodically upgraded, and new computing nodes are added
 
 The four login nodes are shared by hundreds of Talapas users simultaneously. 
 The login nodes share the same filesystem, but having multiple login nodes adds redundancy and fewer points of failure to the Talapas ecosystem.
-They are intended for loading data, transferring large datasets from the internet or the cloud to the Talapas filesystem, preparing software environments, and connecting to IDEs.Unlike other nodes in the cluster, login nodes are open to connections from the broader internet.
+They are intended for loading data, transferring large datasets from the internet or the cloud to the Talapas filesystem, preparing software environments, and connecting to IDEs.
 
 The CPU cores and memory on login nodes are **not** for doing computational work.
 
@@ -56,7 +56,7 @@ If connecting directly to a given login node doesn't work, try another. For exam
 The login and compute nodes share the same filesystem, but
 all non-trivial work occurs on *compute nodes*. 
 
-The compute nodes on Talapas are grouped into *partitions* based
+The compute nodes on Talapas are grouped into one or more *partitions* based
 on what resources they have, how long those resources can be used, and (in the case of condo nodes) which users can access them.
 Each node
 
@@ -99,11 +99,12 @@ Shared data was reserved for the folder `/projects/PIRG/shared`, but it wasn't u
 
 ### I am a PI and have a legacy PIRG. Can you fix our my group's permissions now that members have left?
 Yes, to fix the file structure and permissions within your `projects/PIRG` directory, [open a ticket with RACS](https://hpcrcf.atlassian.net/servicedesk/customer/portal/1). 
+
 RACS can help retrofit your PIRG into a flatter file structure with simpler permissions. 
 When your PIRG is modified, you can choose to keep the existing file and permissions structure or have the new file permissions scheme implemented.
 
 ### Symlinks
-If you do an `ll` or long-listing command on Talapas, you will see special folders in your home directory that begin with `@`.
+If you do an `ll` or long-listing command on Talapas, you may see special folders in your home directory that begin with `@`.
 
 ```bash
 ll
@@ -119,7 +120,8 @@ These folders aren't *actually* in your home directory. Symlinks or *symbolic li
 
 These pointers are added for your convenience so that you can move files and code from your home directory to your project directory.
 
-Some new PIRGs do not have this symlink in place. Do not worry, you can still access the same folder through `/projects/PIRG_NAME`. PIs can request that the symlink be added to their lab members' project directories.
+#### Want a Symlink?
+Some new PIRGs do not have this symlink. Do not worry, you can still access the same folder through `/projects/PIRG_NAME`. PIs can request that the symlink be added to their lab members' project directories.
 
 ## Which Folder Should I Use for What?
 `/home/yourDuckID`
@@ -128,6 +130,9 @@ Some new PIRGs do not have this symlink in place. Do not worry, you can still ac
 `/projects/yourPIRG` 
 - datasets, project data, code you want to share with other members of your PIRG
 
+`/scratch/yourPIRG`
+- temporary files, large intermediate results
+
 ## Transferring Files to Talapas
 There are a variety of ways to transfer files to and from Talapas based on your use case.
 
@@ -135,11 +140,10 @@ There are a variety of ways to transfer files to and from Talapas based on your 
 - To transfer files from the command line, use the `scp` command.
 - To transfer datasets to Talapas from the internet, use the `wget http:/<filepath>` command on a **login node**. Remember, compute nodes are firewalled.
 - For complex or large-scale transfers, try [Globus](https://uoracs.github.io/talapas2-knowledge-base/docs/data_movement/globus) or FTP tools like [Filezilla](https://filezilla-project.org/).
+- For transfer between different institutions, [Globus](https://uoracs.github.io/talapas2-knowledge-base/docs/data_movement/globus) is the preferred tool.
 
 ## Software: Modules on Talapas
 Software on Talapas is controlled through [lmod](https://lmod.readthedocs.io/en/latest/) modules.
-
-You don't need to worry too much lmod's implementation details to use modules, especially if the software you need is already available in the module catalogue.
 
 To run software from within a Slurm job, you'll need to load the appopriate modules.
 
@@ -217,24 +221,6 @@ echo $PATH
 ```
 
 Talapas also supports compiled languages like C and C++. Compilers like gcc and aocc are available as modules.
-
-### R and RStudio
-
-R can be loaded as a module.
-
-```bash
-module load R/4.4.2 
-```
-
-To use RStudio with the Talapas filesystem, load the rstudio/base module and launch the GUI application with the 
-command `rstudio`.
-
-```bash
-module load rstudio/base
-rstudio
-```
-
-![rstudio](../images/rstudio.JPG)
 
 ### Browsing Modules
 Want a more user friendly list of modules available?
@@ -400,7 +386,7 @@ Slurm manages a queue of jobs that determines which node(s) on a partition your 
 
 ### Scheduling Simple Jobs with Slurm
 
-To practice with Slurm tasks, connect to a Talapas login node. For this exercise, feel free to use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
+To practice with Slurm tasks, connect to a Talapas login node. For this exercise, feel free to use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login2.talapas.uoregon.edu).
 
 ## Batch Scheduling with `sbatch`
 

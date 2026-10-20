@@ -24,10 +24,10 @@ To start, make sure you are in your home directory.
 cd ~
 ```
 
-Copy the `/projects/racs_training/intro-hpc-s25/slurm` folder into your home directory. Don't forget `-r` to recursively copy the contents!
+Copy the `/projects/racs_training/intro-hpc-f26/slurm` folder into your home directory. Don't forget `-r` to recursively copy the contents!
 
 ```bash
-cp -r /projects/racs_training/intro-hpc-s25/slurm/ . 
+cp -r /projects/racs_training/intro-hpc-f26/slurm/ . 
 ```
 
 Navigate inside the newly created `slurm` directory.

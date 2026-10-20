@@ -1354,6 +1354,7 @@ We will dive deeper into this topic next week!
 | [cmd] >> [file] | concatenate redirected output of [cmd] to file | echo "Another Line" >> file.txt |
 | history | show command line history | history |
 | grep [pattern] [file or files] | find instances of pattern in file | grep -r 'assignment' . |
+| source [file] | execute a sequence of commands in the current shell | source myscript.sh |
 
 ## Learn More 
 - [*Linux file permissions explained*](https://www.redhat.com/en/blog/linux-file-permissions-explained), Scott McBrien.
