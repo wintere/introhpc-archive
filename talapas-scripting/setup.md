@@ -22,14 +22,13 @@ A web app in the OnDemand client that allows you to browse the Talapas GPFS file
 - Not suitable for writing or editing code, large transfers
 
 
-### [OnDemand -> Clusters -> Talapas Shell Access](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu) 
+### [OnDemand -> Clusters -> Talapas Shell Access](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login2.talapas.uoregon.edu) 
 ![screenshot of OnDemand Shell](../images/web-shell.JPG) *A screenshot of the OnDemand Talapas Shell Access app*
 
 A web app in the OnDemand client that provides command line to access to Talapas from your web browser without SSH.
-- Connects you directly to a **login node**
-- Enter the password for your **DuckID** to proceed
-- Launch interactive or batch jobs
-- Unlike with SSH from your personal terminal, **you can't transfer files to/from your local machine here**
+- Connects you directly to a **login node**.
+- Enter the password for your **DuckID** to proceed. You will not see your password when typing.
+- Unlike with SSH from your personal terminal, **you can't transfer files to/from your local machine here**.
 
 ## Tired of All the Duo 2FA Prompts? UO VPN
 While using the UO VPN is **not required** for today's activities, [RACS recommends](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_login_to_talapas/) that you install and connect to the [UO VPN](https://service.uoregon.edu/TDClient/2030/Portal/KB/ArticleDet?ID=31471) by following this guide.
