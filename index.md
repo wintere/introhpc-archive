@@ -15,7 +15,7 @@ This webpage archives notes, slides, and code samples from the workshop series. 
 * [**Introduction to Bash and HPC:**](./bash/main.html) October 13th, 1pm—3pm *Last Updated: Fall 2026*
 * [**Bash Scripting on Talapas:**](./talapas-scripting/main.html) October 15th, 1pm—3pm *Last Updated: Fall 2026*
 * [**Talapas Essentials:**](./talapas-essentials/main.html) October 20th, 1pm—3pm *Last Updated: Fall 2026*
-* [**Running Jobs with Slurm:**](./slurm/main.html) October 22nd, 1pm—3pm *Last Updated: Fall 2025*
+* [**Running Jobs with Slurm:**](./slurm/main.html) October 22nd, 1pm—3pm *Last Updated: Fall 2026*
 * [**Running Workflows on Talapas:**](./workflows/main.html) October 27th, 1pm—3pm *Last Updated: Fall 2025*
 * [**OnDemand Apps and JupyterLab:**](./ondemand/main.html) October 29th, 1pm—3pm *Last Updated: Fall 2025*
 
