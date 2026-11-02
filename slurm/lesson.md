@@ -1204,29 +1204,38 @@ Adjust your resource requests accordingly after your job runs. Be courteous and 
 Remember that your job's runtime is its **queue time + execution time**, so asking for too many resources can make your job run *slower*
 because it will spend longer in the queue.
 
-* If your job runs out of memory, try doubling the amount you request.
-* If you job uses less memory than you expected, you can use `seff` to determine how much memory to request and have your job schedule faster next time.
+* If your job runs out of memory, try doubling the amount you requested.
+* If you job uses less memory than you expected, ask for less and have your job schedule faster next time.
 
-This job, which spends its CPU time "sleeping" or waiting, uses very little of its requested resources.
-
-### Emailing Job Status 
-Running a really long job? Tired of checking `squeue`?
-
-SLURM can even email you when jobs reach certain states:
-
-```bash
-### #SBATCH --mail-type=BEGIN,END,FAIL      
-### #SBATCH --mail-user=<duckID>@uoregon.edu
-```
-
-Edit these lines in your sbatch script with *your* DuckID. You should get an email from Slurm when the job begins and finishes (whether in success or failure.) 
-
-### Quick Slurm Scheduling Tips
-
+## Quick Slurm Scheduling Tips
 * Read the resource descriptions carefully: jobs that exceed their request time, memory, or processor usage will be automatically killed.
 * Need to run for more than 24 hours? You must use `computelong`, `gpulong`, or `memorylong`.
 * Most jobs should have `--ntasks-per-node=1` and `--cpus-per-task=1` if they do not reference tools that take advantage of multiple CPU cores.
 * Remember to exit interactive jobs when you're finished to free up resources for your colleagues.
+
+## Slurm Defaults on Talapas
+I have selected a few common parameters. These constraints do not necessarily apply on private condo nodes or the `preempt` partition. It's better to be specific than to be surprised.
+
+| Parameter    | Default| Description | Notes
+| -------- | ------- | ---------- | ----------------|
+| ntasks | 1 | tasks per job | |
+| cpus-per-task | 1 | number of  cpu cores per task | |
+| mem-per-cpu | 4G  | memory per cpu core        | |
+| mem | 4G | memory per node | cannot be used with mem-per-cpu |
+| nodes |   1  | nodes allocated for the job | [requires node-to-node communication](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755756676/How-to+Submit+a+MPI+Job) |
+| gpus   | 0   | gpus per job | must be >1 to use gpus|
+| error | slurm-%j.err | default error log location | |
+| output | slurm-%j.out | default output log location | |
+ 
+### Emailing Job Status 
+You can configure Slurm to email you when jobs reach certain states:
+
+```bash
+#SBATCH --mail-type=BEGIN,END,FAIL      
+#SBATCH --mail-user=<duckID>@uoregon.edu
+```
+
+Add these lines to your Slurm job, updating `--mail-user=` with your email address.
 
 ## Today's Slurm Commands
 

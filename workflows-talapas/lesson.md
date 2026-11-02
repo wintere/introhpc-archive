@@ -8,388 +8,30 @@ nav_order: 2
 ---
 
 # Workflows on Talapas
-This lesson expands on the principles of Slurm job configuration and parallelization introduced in the first Slurm lesson. 
-It also introduces [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/index.html), a popular software package and virtual environment management tool available on Talapas that can be used
+This lesson introduces supporting tools for programming on Talapas like [Visual Studio Code](https://code.visualstudio.com/?_exp_home=e855cfac50), a code editor with remote development support, and [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/index.html), a popular software package and virtual environment management tool available on Talapas that can be used
 to configure virtual environments for batch scripts or interactive jobs.
 
-## Lesson Setup
-For this lesson, you will need to connect to a Talapas login node through a shell application of your choice.
+## Connecting to Talapas with Visual Studio Code
+[Visual Studio Code](https://code.visualstudio.com) or "VS Code" is an integrated development environment (IDE) with an integrated text editor, file manager, and terminal that can connect to Talapas through an SSH connection. This allows you to develop code on Talapas from a convenient graphical user interface on your personal computer.
 
-For convenience, we recommend the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login1.talapas.uoregon.edu).
+![An example Visual Studio Code instance](../images/vs-code.png)
+*VS Code when connected to Talapa, launching a Slurm batch script through the integrated terminal.*
 
-Make sure you are in your home directory.
+If you would like to use VS Code on Talapas, RACS has a [guide](uoracs.github.io/talapas2-knowledge-base/docs/connecting_to_talapas/how-to_use_vscode_to_login/) for configuring the [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh) to work with Talapas.
 
-```bash
-cd ~
-```
+### Talapas and VS Code: Best Practices
 
-Copy the `slurm_day2` folder to your home directory.
-```bash
-cp -r /projects/racs_training/intro-hpc-s25/slurm_day2/ .
-```
+* You must connect to one of the four login nodes.
+* Connect to Talapas while on the [VPN](../talapas-scripting/setup.html).
+* If you are prompted for Duo Authentication when trying to connect, make sure you've added your [SSH key](../tutorials/ssh.html) to that login node.
+* As always, you must launch a batch job or interactive job through Slurm to test the scripts you write with VS Code.
 
-Navigate inside the `slurm_day2` directory you copied over.
-
-```bash
-cd slurm_day2
-```
-
-## Array Jobs: Creating Tasks from an Array of Input Files
-Check the folder contents using `ls`.
-
-```bash
-ls -F
-```
-
-```output
-books_example/  python_pi_example/
-deps_example/   snakemake_example/
-```
-
-First, we will examine the `books_example` Slurm task.
-
-Change to the `books_example` directory.
-```bash
-cd books_example
-ls -F
-```
-
-```output
-books/  books.sbatch*  logs/
-```
-
-
-In the `books` folder, you should have the text of five books.
-
-Use `ls` to list the filenames of the books stored there.
-
-```bash
-ls books
-```
-
-```output
-alice_in_wonderland.txt         moby_dick.txt            romeo_and_juliet.txt
-complete_works_shakespeare.txt  pride_and_prejudice.txt
-```
-
-Let's look at an example array job `books.sbatch` which has one subtask for each of the five books in the `books/` folder.
-
-```bash
-cat books.sbatch
-```
-
-```bash
-#!/bin/bash
-
-#SBATCH --partition=compute              ### Partition (like a queue in PBS)
-#SBATCH --account=racs_training          ### Account used for job submission
-
-### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
-#SBATCH --job-name=books_wc_array        ### Job Name
-#SBATCH --output=logs/%x-%A-%a.out       ### File in which to store job output
-#SBATCH --error=logs/%x-%A-%a.err        ### File in which to store job error messages
-
-#SBATCH --time=0-00:05:00                ### Wall clock time limit in Days-HH:MM:SS
-#SBATCH --nodes=1                        ### Number of nodes needed for the job
-#SBATCH --mem=50M                        ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
-#SBATCH --ntasks-per-node=1              ### Number of tasks to be launched per Node
-#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
-
-#SBATCH --array=0-4
-
-BOOKS=(books/*)
-srun wc -c ${BOOKS[$SLURM_ARRAY_TASK_ID]}
-```
-
-First, the variable BOOKS is created using a wildcard `BOOKS=(books/*)`. 
-
-BOOKS is a list of the *filenames* of each of the files in the `books` folder.
-
-```output
-books/alice_in_wonderland.txt books/complete_works_shakespeare.txt books/moby_dick.txt books/pride_and_prejudice.txt books/romeo_and_juliet.txt
-```
-
-Then, srun is used to launch subtasks that compute the `wc - c` or "word count" in characters of each of the five books.
-
-```bash
-sbatch books.sbatch
-```
-
-```output
-Submitted batch job 34763686
-```
-
-Check the status of each of the five tasks using `sacct`.
-
-```bash
-sacct
-```
-
-```output
-34763686_0   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_0.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_0.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_0.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_1   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_1.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_1.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_1.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_2   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_2.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_2.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_2.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_3   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_3.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_3.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_3.0         wc            racs_trai+          1  COMPLETED      0:0 
-34763686_4   books_wc_+    compute racs_trai+          1  COMPLETED      0:0 
-34763686_4.+      batch            racs_trai+          1  COMPLETED      0:0 
-34763686_4.+     extern            racs_trai+          1  COMPLETED      0:0 
-34763686_4.0         wc            racs_trai+          1  COMPLETED      0:0 
-```
-
-These following lines of `sbatch` configuration direct the output logs to the `logs` folder.
-The `%x-%A-%a` notation creates log files named `(job name)-(array parent job)-(array index)`.out.
-
-```bash
-#SBATCH --output=logs/%x-%A-%a.out       ### File in which to store job output
-#SBATCH --error=logs/%x-%A-%a.err        ### File in which to store job error messages
-```
-
-Inspect the logs folder with `ls`.
-```bash
-ls logs
-```
-```output
-books_wc_array-34763686-0.err
-books_wc_array-34763686-0.out
-books_wc_array-34763686-1.err
-books_wc_array-34763686-1.out
-books_wc_array-34763686-2.err
-books_wc_array-34763686-2.out
-books_wc_array-34763686-3.err
-books_wc_array-34763686-3.out
-books_wc_array-34763686-4.err
-books_wc_array-34763686-4.out
-```
-Let's use `tail` and a `*` wildcard to check the last few lines of each of the output logs.
-
-```bash
-tail logs/books*.out
-```
-
-As expected, the output logs contain the results of the `wc -c` followed by
-the book that was listed as input.
-
-```output
-==> logs/books_wc_array-34763686-0.out <==
-174357 books/alice_in_wonderland.txt
-
-==> logs/books_wc_array-34763686-1.out <==
-5638516 books/complete_works_shakespeare.txt
-
-==> logs/books_wc_array-34763686-2.out <==
-1276288 books/moby_dick.txt
-
-==> logs/books_wc_array-34763686-3.out <==
-772419 books/pride_and_prejudice.txt
-
-==> logs/books_wc_array-34763686-4.out <==
-169541 books/romeo_and_juliet.txt
-```
-
-## Evaluating Resource Usage on Running Jobs with `htop`
-Remember the `seff` command? That's a great way to evaluate resource usage of a *finished* job. But what about resource usage for running jobs?
-
-Navigate to the `python_pi_example` directory and inspect the contents.
-```bash
-cd ../python_pi_example
-ls
-```
-
-```output
-calculate_pi.py  calculate_pi.sbatch
-```
-
-Inspect `calculate_pi.sbatch`.
-
-```bash
-nano calculate_pi.sbatch
-```
-
-```bash
-#!/bin/bash
-
-#SBATCH --partition=compute              ### Partition (like a queue in PBS)
-#SBATCH --account=racs_training          ### Account used for job submission
-
-### NOTE: %u=userID, %x=jobName, %N=nodeID, %j=jobID, %A=arrayMain, %a=arraySub
-#SBATCH --job-name=digits_of_pi          ### Job Name
-#SBATCH --output=%x.log                  ### File in which to store job output
-
-#SBATCH --time=0-00:60:00                ### Wall clock time limit in Days-HH:MM:SS
-#SBATCH --nodes=1                        ### Number of nodes needed for the job
-#SBATCH --mem=100M                       ### Total Memory for job in MB -- can do K/M/G/T for KB/MB/GB/TB
-#SBATCH --cpus-per-task=1                ### Number of cpus/cores to be launched per Task
-
-### Load needed modules
-module purge
-module load python3/3.11.4
-module list
-
-### Run your actual program
-python3 calculate_pi.py 50000
-```
-
-This is a serial job that loads the **python3** module and executes a Python script that computes the first 5000 digits of pi.
-
-```bash
-cat calculate_pi.py
-```
-
-```python
-#!/usr/bin/env python3
-
-import sys
-
-def calcPi(limit):  # Generator function
-    """
-    Prints out the digits of PI
-    until it reaches the given limit
-    """
-
-    q, r, t, k, n, l = 1, 0, 1, 1, 3, 3
-
-    decimal = limit
-    counter = 0
-
-    while counter != decimal + 1:
-            if 4 * q + r - t < n * t:
-                    # yield digit
-                    yield n
-                    # insert period after first digit
-                    if counter == 0:
-                            yield '.'
-                    # end
-                    if decimal == counter:
-                            break
-                    counter += 1
-                    nr = 10 * (r - n * t)
-                    n = ((10 * (3 * q + r)) // t) - 10 * n
-                    q *= 10
-                    r = nr
-            else:
-                    nr = (2 * q + r) * l
-                    nn = (q * (7 * k) + 2 + (r * l)) // (t * l)
-                    q *= k
-                    t *= l
-                    l += 2
-                    k += 1
-                    n = nn
-                    r = nr
-
-
-def main():  # Wrapper function
-
-    num_digits = sys.argv[1]
-
-    for d in calcPi(int(num_digits)):
-        print(d, end='')
-
-if __name__ == '__main__':
-    main()
-```
-
-Launch the Slurm job with `sbatch`.
-
-```bash
-sbatch calculate_pi.sbatch
-```
-
-```output
-Submitted batch job 34799867
-```
-
-Check your queue. Note the node number (hostname) of the compute node where the job is currently running.
-```bash
-squeue --me
-```
-
-```output
-             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-          34799867   compute digits_o    emwin  R       0:02      1 n0135
-```
-
-As we can see, we are currently running on node n0135.
-
-Because we have an active Slurm task on node n0135, we can *remote into that compute node* from the login node with `ssh`.
-
-```bash
-ssh n0135
-```
-
-Enter the password to your DuckID when prompted. Confirm that you are connected with the `hostname` command.
-```bash
-hostname
-```
-
-```output
-n0135.talapas.uoregon.edu
-```
-
-While you are on the compute node, the [**htop command**](https://linux.die.net/man/1/htop) can be used to evaluate the resources usage of your running processes. 
-
-```bash
-htop -u $USER
-```
-
-![A screenshot of the htop command on a Talapas node](../images/htop.png)
-
-The `RES` column measures RAM per process in KB.
-The `TIME` column indicates how long the process has been running.
-
-Your connection to the compute node will terminate when your job terminates.
-After the job has finished, you can use `seff` to get more granular information about your job.
-
-### Don't Overwhelm the Scheduler!
-Do not make 50,000 individual jobs with `srun` and a for-loop.
-The maximum number of concurrent array jobs per user on Talapas is 12,000.
-
-To get around these restrictions, you can tell Slurm to limit the nubmer of jobs submitted to the queue at a time.
-Using `#SBATCH --array=0-50000%100` parameter submits only 100 subjobs to Slurm at a time.
-
-### The Slurm `nodes` Parameter
-Unless you're using an MPI or message passing interface, you should use the default
-sbatch param of  `--nodes=1`.
-Your jobs can't communicate between computers (nodes) without
-code compatible  with MPI. Fall into this case? RACS has a [guide for configuring jobs that use MPI on Talapas](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755756676/How-to+Submit+a+MPI+Job).
-
-## Slurm Defaults on Talapas
- I have selected a few common parameters. These constraints are subject to change and do not necessarily apply on condo nodes.
-
-| Parameter    | Default| Description | Notes
-| -------- | ------- | ---------- | ----------------|
-| ntasks | 1 | tasks per job | |
-| cpus-per-task | 1 | number of  cpu threads per task | |
-| mem-per-cpu | 4G  | memory per cpu thread        | |
-| mem | 4G* | memory per node | cannot be used with mem-per-cpu |
-| nodes |   1  | nodes allocated for the job | [requires mpi](https://hpcrcf.atlassian.net/wiki/spaces/TW/pages/2755756676/How-to+Submit+a+MPI+Job) |
-| gpus   | 0   | gpus per job | must be >1 to use gpus|
-| error | slurm-%j.err | default error log location | |
-| output | slurm-%j.out | default output log location | |
-
-In summary, parallelism on Talapas is enabled by
-* using code that *supports* multiple tasks, threads, or nodes
-* enabling additional tasks, cores, or nodes as sbatch parameters
-* OR using sbatch array jobs to launch simultaneous, independent jobs
-
-Without meeting these requirements, your jobs will run serially.
-
-## Conda Environments
+## What is Conda?
 [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html) is an open-source package and environment management system. 
-It helps you easily install, run, and update software packages and manage isolated environments for different projects. 
 
-Conda works across platforms (Windows, macOS, Linux) and is especially popular in data science and scientific computing because it handles complex dependency situations like:
+It allows you to manage and configure virtual environments with different sets of packages for different projects. 
+
+Conda works across many platforms (Windows, macOS, Linux) and is popular in scientific computing and data science applications because it handles complex dependency situations like:
   - Python packages that require older versions of Python
   - non-Python libraries like R and Julia
   - packages from different channels (conda, conda-forge, pip)
@@ -401,7 +43,7 @@ We will walk through some of these steps in this exercise.
 1. Conda environments allow for reproducibility and consistency when running code on different devices and operating systems.
 2. Conda only loads the packages you need for that specific workflow (helps reduce the amount of "clutter" in your environment)
 3. Each Conda environment is a self-contained workspace, so you can: 
-    - Use different Python versions side-by-side (e.g. Python 3.10 & 3.12)
+    - Use different Python versions for different projects (e.g. Python 3.10 & 3.12)
     - Avoid dependency conflicts between projects
 
 Many researchers maintain separate conda environments for different projects and contexts.
@@ -409,112 +51,148 @@ We highly recommend this approach for reproducibility, consistency, and ease of 
 among colleagues.
 
 ### Conda Options on Talapas 
-We have two main conda distributions available to users: 
-- **miniconda3/20240410** offical source, maintained by anaconda, uses defaults as default channel, minimal installer for the Anaconda ecosystem
-- **miniforge3/20240410** open-source distribution, maintained by community, uses conda-forge as default channel, fully open-source conda installer using community packages. 
+We have two main Conda distributions available to users: 
+- [**miniconda3**](https://continuumio-docs.readthedocs-hosted.com/miniconda/) - the offical source, maintained by Anaconda, uses defaults as default channel, minimal installer for the Anaconda ecosystem
+- [**miniforge3**](https://github.com/conda-forge/miniforge) - an open-source distribution, maintained by community, uses conda-forge as default channel, fully open-source Conda installer using community packages. 
 
-### Building a Conda Environment from Scratch
-Copy the `conda` folder to your home directory and navigate inside.
+We recommend using the latest version of miniconda3, `miniconda3/20260319` for most use cases.
+
+## Building Conda Environments from Scratch
+Connect to a Talapas login node using a terminal application of your choice. If you would like to connect through your web browser, use the [Talapas OnDemand shell](https://ondemand.talapas.uoregon.edu/pun/sys/shell/ssh/login2.talapas.uoregon.edu).
+
+Copy the `/projects/racs_training/intro-hpc-f26/conda` folder to your home directory. Don't forget the `-r` flag.
+
 ```bash
-cp -r /projects/racs_training/conda/  ~
-cd ~/conda
+cp -r /projects/racs_training/intro-hpc-f26/conda ~
 ```
 
-Look inside with `ls`. There's a `hello_world.py` script that requires a Python instance of some kind.
+Navigate inside the new `conda` folder and use `ls` to inspect the contents.
+
 ```bash
+cd ~/conda
 ls
 ```
-
 ```output
-basic_r.R  conda_notes.md  hello_world.py  jupyter.yml
+compute_stats.py  compute_stats.sbatch  compute_stats_test.sbatch  err  out
 ```
 
-Let's load the `miniconda3/20240410` module.
+Inspect `compute_stats.py` with `cat`.
+
 ```bash
-module load miniconda3/20240410
+cat compute_stats.py
+```
+```python
+import os, time
+import numpy as np
+from multiprocessing import Pool
+
+N_WORKERS = int(os.environ.get("SLURM_CPUS_PER_TASK", 16))
+RUN_SECONDS = 1 * 60          # runs for one minute
+MATRIX_N = 4096                # 4096x4096 float64 = ~134 MB per matrix
+BUFFER_GB = 1.4                # per-worker memory buffer (16 x 1.4 = ~22 GB)
+
+
+def worker(seed):
+    rng = np.random.default_rng(seed)
+    buf = rng.random(int(BUFFER_GB * 1e9 / 8))
+    a = rng.random((MATRIX_N, MATRIX_N))
+    b = rng.random((MATRIX_N, MATRIX_N))
+
+    end = time.time() + RUN_SECONDS
+    iters, inside, total = 0, 0, 0
+    while time.time() < end:
+        c = a @ b
+        a = c / np.linalg.norm(c)
+        pts = rng.random((5_000_000, 2))
+        inside += int(np.count_nonzero((pts ** 2).sum(axis=1) <= 1.0))
+        total += 5_000_000
+        buf[::1000] += 1e-9
+        iters += 1
+    return seed, iters, inside, total
+
+
+if __name__ == "__main__":
+    print(f"Starting {N_WORKERS} workers for {RUN_SECONDS/60:.0f} minutes", flush=True)
+    with Pool(N_WORKERS) as pool:
+        results = pool.map(worker, range(N_WORKERS))
+    inside = sum(r[2] for r in results)
+    total = sum(r[3] for r in results)
+    print(f"Matrix iterations (all workers): {sum(r[1] for r in results)}")
+    print(f"Pi estimate from {total:,} samples: {4 * inside / total:.8f}")
 ```
 
-Check the module is loaded with `module list`.
+This Python script estimates pi for exactly one minute before exiting. It requires the package [numpy](https://numpy.org/), which is not available in a default Python installation. 
+
+We need to create a virtual environment with `numpy` installed in order to execute the script.
+
+Load the latest version of `miniconda3` with the `module load` command.
+
 ```bash
-module list
+module load miniconda3/20260319
 ```
 
-```output
-Currently Loaded Modules:
-  1) miniconda3/20240410
-```
-
-List the conda environments available to you with `conda env list`. 
-
-There are a number of public conda environments maintained by RACS in the `/packages/miniconda3/20240410/envs/` folder.
-If you have not created any conda environments of your own, then only the public environments compiled by
-RACS will be listed. 
+List the conda environments available to you with `conda env list`.
 
 ```bash
 conda env list
 ```
-
 ```output
 # conda environments:
 #
-base                     /packages/miniconda3/20240410
-R-test-pack              /packages/miniconda3/20240410/envs/R-test-pack
-SE3nv                    /packages/miniconda3/20240410/envs/SE3nv
-ancestryhmm-v2           /packages/miniconda3/20240410/envs/ancestryhmm-v2
-argweaver-20241202       /packages/miniconda3/20240410/envs/argweaver-20241202
-bgchm-20241008           /packages/miniconda3/20240410/envs/bgchm-20241008
-brainiak-20240412        /packages/miniconda3/20240410/envs/brainiak-20240412
-dcm2bids-20240904        /packages/miniconda3/20240410/envs/dcm2bids-20240904
-dcm2niix-20240416        /packages/miniconda3/20240410/envs/dcm2niix-20240416
-fmriprep-docker          /packages/miniconda3/20240410/envs/fmriprep-docker
-gambit_bsm-20240416      /packages/miniconda3/20240410/envs/gambit_bsm-20240416
-gnomix                   /packages/miniconda3/20240410/envs/gnomix
+# * -> active
+# + -> frozen
+                         /gpfs/projects/library_it/shared/xml-processing
+dualkernel2              /home/emwin/.conda/envs/dualkernel2
+geospatial               /home/emwin/.conda/envs/geospatial
 ...
 ```
 
+There are a number of public Conda environments maintained by RACS in the `/packages/miniconda3/` folder. If you have not created any Conda environments of your own, then only the public environments compiled by RACS will be listed.
 
-Let's create a new environment named `myenv` that will be stored inside the `.conda` folder of your home directory.
-You can specify which python version is used through the `python=` argument.
+Now that you've loaded `miniconda3`, we can use the `conda create` command to create environments. 
 
-```bash
-conda create --name myenv python=3.12 numpy matplotlib
-```
-
-This command creates an environment with the **numpy** and **matplotlib** packages. When Conda finishes building the environment, you will see a message like this.
-
-```output
-Preparing transaction: done                                 
-Verifying transaction: done                                 
-Executing transaction: done                                 
-#                                                           
-# To activate this environment, use                         
-#                                                           
-#     $ conda activate myenv                                
-#                                                           
-# To deactivate an active environment, use                  
-#                                                           
-#     $ conda deactivate 
-```
-
-To activate *myenv*, run the `conda activate` command.
+Start by creating a new Python 3.12 environment with the name `hpc-workshop-f26`. This new environment will be stored inside the `.conda` folder of your home directory. 
 
 ```bash
-conda activate myenv
+conda create --name hpc-workshop-f26 python=3.12 -y
 ```
-
-Observe that your environment name will now appear to the left of your terminal prompt.
 ```output
-(myenv) [emwin@login2 conda]$     
+# To activate this environment, use
+#
+#     $ conda activate hpc-workshop-f26
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
 ```
 
-From inside our conda environment, we can run the `which python` command to confirm we are using the Python instance stored inside *myenv*.
+We have now created an environment with Python 3.12 installed and no specialized packages.
+
+Activate the `hpc-workshop-f26` environment.
+
+```bash
+conda activate hpc-workshop-f26
+```
+
+Observe that your terminal prompt now has the name of your current Conda environment `hpc-workshop-f26` as a prefix.
+
+```output
+(hpc-workshop-f26) [emwin@login2 conda]$ 
+```
+
+From inside our conda environment, we can run the `which python` command to confirm we are using the Python executable stored inside `/.conda/envs/hpc-workshop-f26/bin/`.
 
 ```bash
 which python
 ```
-
 ```output
-~/.conda/envs/myenv/bin/python  
+~/.conda/envs/hpc-workshop-f26/bin/python  
+```
+
+To install Python packages to an environment, use the `conda install` comand followed by the names of the packages you want to install. Use `-y` to skip confirmation prompts.
+
+```bash
+conda install numpy -y
 ```
 
 To see which packages are in the current environment, use `conda list`.
@@ -522,309 +200,334 @@ To see which packages are in the current environment, use `conda list`.
 ```bash
 conda list
 ```
-
-We can scroll through the list to find `matplotlib` and `numpy`.
 ```output
+# packages in environment at /home/emwin/.conda/envs/hpc-workshop-f26:
+#
+# Name                     Version          Build                  Channel
+_libgcc_mutex              0.1              main
+_openmp_mutex              5.1              52_gnu
+blas                       1.0              mkl
+bzip2                      1.0.8            h5eee18b_6
+ca-certificates            2026.10.20       h06a4308_0
+icu                        73.1             h6a678d5_0
+intel-openmp               2025.0.0         h06a4308_1172
+ld_impl_linux-64           2.44             h9e0c5a2_3
+libexpat                   2.9.0            h7354ed3_0
+libffi                     3.4.8            h06d3fd0_3
+libgcc                     15.2.0           h69a1729_8
+libgcc-ng                  15.2.0           h166f726_8
+libhwloc                   2.12.1           default_hf1bbc79_1000
+libstdcxx                  15.2.0           h39759b7_8
+libstdcxx-ng               15.2.0           hc03a8fd_8
+libuuid                    1.41.5           h5eee18b_0
+libxcb                     1.17.0           h9b100fa_0
+libxml2                    2.13.9           h2c43086_0
+libzlib                    1.3.2            h47b2149_0
+mkl                        2025.0.0         h6d8faa4_942
+mkl-service                2.9.0            py312h365c7f6_0
+mkl_fft                    2.4.0            py312h14d6ddd_0
+mkl_random                 1.5.0            py312h973aee8_0
+ncurses                    6.6              hfaaeb4e_0
+numpy                      2.5.4            py312ha8834a8_0
+numpy-base                 2.5.4            py312h7c74580_0
+openssl                    3.5.9            h1b28b03_0
 ...
-matplotlib                3.10.0          py312h06a4308_0  
-matplotlib-base           3.10.0          py312hbfdbfaf_0  
-mkl                       2023.1.0         h213fc3f_46344  
-mkl-service               2.4.0           py312h5eee18b_2  
-mkl_fft                   1.3.11          py312h5eee18b_0  
-mkl_random                1.2.8           py312h526ad5a_0  
-mysql                     8.4.0                h721767e_2  
-ncurses                   6.4                  h6a678d5_0  
-numpy                     2.2.5           py312h2470af2_0
-...
 ```
 
-Alternatively, use of piping and `grep` will return only the lines that reference the packages of interest.
-```bash
- conda list | grep -E "matplotlib|numpy"
-```
-
-```output
-matplotlib                3.10.0          py312h06a4308_0  
-matplotlib-base           3.10.0          py312hbfdbfaf_0  
-numpy                     2.2.5           py312h2470af2_0  
-numpy-base                2.2.5           py312h06ae042_0  
-```
-
-Inspect `hello_world.py` with `nano`.
+You can use piping and `grep` to confirm that `numpy` is among the installed packages.
 
 ```bash
-nano hello_world.py
-```
-
-```python
-import subprocess
-import numpy
-import time
-import pandas as pd
-
-def average_age():
-    data = {'Name': ['Alice', 'Bob', 'Charlie'], 'Age': [25, 30, 35]}
-    df = pd.DataFrame(data)
-    return df['Age'].mean()
-
-
-
-def compute_sum():
-    res = 4 + 4
-    return res
-
-def main():
-    print("Hello World!")
-    output = compute_sum()
-    print(output)
-    print(average_age())
-    
-
-
-if __name__ == "__main__":
-    main()
-```
-
-For those unfamiliar with Python, this script executes the following statements:
-  * prints "Hello World!"
-  * assigns of the results of the `compute_sum()` function to the variable output
-  * prints the value stored at output
-  * prints the result of the `average_age()` function, which operates on a [**Pandas DataFrame**](https://pandas.pydata.org/docs/)
-
-A login node is *not* an appopriate location to run non-trivial scripts, but this toy script is safe to test there.
-
-
-Use the `python` command to run the version of Python in the active conda environment.
-
-```bash
-python hello_world.py
+conda list | grep "numpy"
 ```
 ```output
-Traceback (most recent call last):
-  File "/gpfs/home/emwin/conda/hello_world.py", line 4, in <module>
-    import pandas as pd
-ModuleNotFoundError: No module named 'pandas'
+numpy                      2.5.4            py312ha8834a8_0
+numpy-base                 2.5.4            py312h7c74580_0
 ```
 
-This fails because *myenv* is missing the `pandas` module. 
-We need to install pandas to the current environment using `conda install`.
+Now that you've finished configuring your Conda environment, deactivate it with `conda deactivate`. 
+
+To avoid unintentional software interactions, always use the `sbatch` and `salloc` commands from *outside* of a virtual environment.
 
 ```bash
-conda install pandas
+conda deactivate
 ```
 
-When the installation is finished, rerun the script.
+Inspect `compute_stats.sbatch` with `cat`.
 ```bash
-python hello_world.py 
+cat compute_stats.sbatch
 ```
-
-```output
-Hello World!
-8
-30.0
-```
-This is the output we expected from inspecting the source code.
-
-### R in Conda
-
-You can also install R and R packages to conda environments.
 ```bash
-conda install R=4.3
+#SBATCH --job-name=compute_stats
+#SBATCH --partition=compute
+#SBATCH --account=racs_training
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=30G
+#SBATCH --time=00:15:00
+#SBATCH --output=out/compute_stats_%j.out 
+#SBATCH --error=err/compute_stats_%j.err  
+
+export OMP_NUM_THREADS=1   # each worker is single-threaded; parallelism comes from the pool
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+module purge
+module load miniconda3/20260319 
+conda activate hpc-workshop-f26
+
+echo "Job $SLURM_JOB_ID on $(hostname) with $SLURM_CPUS_PER_TASK CPUs, started $(date)"
+python3 compute_stats.py  
+echo "Finished $(date)"
+conda deactivate
 ```
 
-Let's examine `basic_r.R`
+Let's unpack this job:
 
+* This job requests 30GB of memory and a time limit of 15 minutes.
+* As a [Python multiprocessing job](https://docs.python.org/3/library/multiprocessing.html#introduction), it requests 16 CPU cores and allocates one thread per core.
+* It activates the `miniconda3/20260319` environment.
+* It uses `conda activate` to activate the `hpc-workshop-f26` environment we already created.
+* From inside the `hpc-workshop-f26` environment, it launches `python3` and runs the `compute_stats.py` program.
+* `conda deactivate` is used to exit the environment after the job finishes.
+
+Launch the job with `sbatch`.
 ```bash
-cat basic_r.R
-```
-
-```R
-add_numbers1 <- 4 * 2
-add_numbers6 <- 4 * 8
-add_numbers3 <- 4 * 9
-add_numbers4 <- 4 * 12
-add_numbers5 <- 9 * 7
-add_numbers2 <- 5 * 8
-
-results <- list(
-  add_numbers1 = add_numbers1,
-  add_numbers2 = add_numbers2,
-  add_numbers3 = add_numbers3,
-  add_numbers4 = add_numbers4,
-  add_numbers5 = add_numbers5,
-  add_numbers6 = add_numbers6
-)
-
-# Write results to a file
-writeLines(paste(names(results), results, sep=": "), "results.txt")
-```
-
-Because R has been installed inside the *myenv* Conda environment, the `Rscript` is available on our path when *myenv* is activated.
-
-```bash
-which Rscript
-```
-
-```output
-~/.conda/envs/myenv/bin/Rscript
-```
-
-Launch the `basic_r.R` script using `Rscript`.
-
-```bash
-Rscript basic_r.R
-```
-
-Inspect the results file from the script, `results.txt`.
-```output
-add_numbers1: 8
-add_numbers2: 40
-add_numbers3: 36
-add_numbers4: 48
-add_numbers5: 63
-add_numbers6: 32
-```
-
-### Exporting a Conda Environment
-To share our Conda environment, we can create a textual representation of the environment in the form of a special `.yml` configuration file. 
-Conventionally, conda environments bundled with source code are named `environment.yml`.
-
-The `conda env export` command [exports the environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#sharing-an-environment), which is written to `myenv-environment.yml`. 
-
-```bash
-conda env export > myenv-environment.yml
-```
-Inspect the contents with `cat`.
-
-```bash
-cat myenv-environment.yml
+sbatch compute_stats.sbatch
 ```
 ```output
-name: myenv
+Submitted batch job 48182217
+```
+
+Check `sacct` for the job's completion status. 
+```bash
+sacct
+```
+```output
+JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
+------------ ---------- ---------- ---------- ---------- ---------- -------- 
+48182217     compute_s+    compute racs_trai+         16  COMPLETED      0:0 
+48182217.ba+      batch            racs_trai+         16  COMPLETED      0:0 
+48182217.ex+     extern            racs_trai+         16  COMPLETED      0:0
+```
+
+Check your output logs with `cat`.
+```bash
+cat out/*
+```
+```output
+Job 48182217 on n0135.talapas.uoregon.edu with 16 CPUs, started Wed Oct 28 17:01:21 PDT 2026
+Finished Wed Oct 28 17:01:21 PDT 2026
+```
+
+As you can see, the job completed successfully because it was able to import the `numpy` package from the conda environment.
+
+## Exporting a Conda Environment
+To share our Conda environment, we can create a textual representation of the packages installed in the environment in a special `.yml` configuration file. 
+Conventionally, Conda environments bundled with source code are named `environment.yml`.
+
+The `conda export` command [exports the environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#sharing-an-environment), in an output format of your choice. 
+The resulting file can be used to recreate the environment on a different computer or even on a different operating system.
+
+In this example, we will use the default format and write the configuration to the file `environment.yml`. The `-n` argument allows us to specify which environment we want to export. 
+
+```bash
+conda export -n hpc-workshop-f26  > environment.yml
+```
+
+Inspect the contents of `environment.yml` with `cat`.
+```bash
+cat environment.yml
+```
+```output
+name: hpc-workshop-f26
 channels:
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
-  - _openmp_mutex=5.1=1_gnu
-  - _r-mutex=1.0.0=anacondar_1
-  - _sysroot_linux-64_curr_repodata_hack=3=haa98f57_10
-  - binutils_impl_linux-64=2.40=h5293946_0
-  - binutils_linux-64=2.40.0=hc2dff05_2
-  - blas=1.0=openblas
-  - bottleneck=1.4.2=py312ha883a20_0
-  - brotli-python=1.0.9=py312h6a678d5_9
-  - bwidget=1.9.16=h9eba36c_0
+  - _openmp_mutex=5.1=52_gnu
+  - blas=1.0=mkl
   - bzip2=1.0.8=h5eee18b_6
-  - c-ares=1.19.1=h5eee18b_0
-  - ca-certificates=2025.2.25=h06a4308_0
-  - cairo=1.16.0=hb05425b_5
-...
+  - ca-certificates=2026.10.20=h06a4308_0
+  - icu=73.1=h6a678d5_0
+  - intel-openmp=2025.0.0=h06a4308_1172
+  - ld_impl_linux-64=2.44=h9e0c5a2_3
+  - libexpat=2.9.0=h7354ed3_0
+  - libffi=3.4.8=h06d3fd0_3
+  - libgcc=15.2.0=h69a1729_8
+  - libgcc-ng=15.2.0=h166f726_8
+  - libhwloc=2.12.1=default_hf1bbc79_1000
+  - libstdcxx=15.2.0=h39759b7_8
+  - libstdcxx-ng=15.2.0=hc03a8fd_8
+  - libuuid=1.41.5=h5eee18b_0
+  - libxcb=1.17.0=h9b100fa_0
+  - libxml2=2.13.9=h2c43086_0
+  - libzlib=1.3.2=h47b2149_0
+  - mkl=2025.0.0=h6d8faa4_942
+  - mkl-service=2.9.0=py312h365c7f6_0
+  - mkl_fft=2.4.0=py312h14d6ddd_0
+  - mkl_random=1.5.0=py312h973aee8_0
+  - ncurses=6.6=hfaaeb4e_0
+  - numpy=2.5.4=py312ha8834a8_0
+  - numpy-base=2.5.4=py312h7c74580_0
+  - openssl=3.5.9=h1b28b03_0
+  - packaging=26.3=py312h06a4308_0
+  - pip=26.2.2=pyhc872135_0
+  - pthread-stubs=0.3=h47b2149_2
+  - python=3.12.16=hcd0331c_0
+  - readline=8.3=hc2a1206_0
+  - setuptools=84.0.0=py312h06a4308_0
+  - sqlite=3.53.4=h795bf6d_0
+  - tbb=2022.3.0=h698db13_0
+  - tbb-devel=2022.3.0=h698db13_0
+  - tk=8.6.15=h54e0aa7_0
+  - tzdata=2026c=he532380_0
+  - wheel=0.48.0=py312h06a4308_0
+  - xorg-libx11=1.8.14=h65de747_0
+  - xorg-libxau=1.0.12=h9b100fa_0
+  - xorg-libxdmcp=1.1.5=h9b100fa_0
+  - xorg-xorgproto=2025.1=h47b2149_0
+  - xz=5.8.4=h140a991_0
+  - zlib=1.3.2=h47b2149_0
+prefix: /home/emwin/.conda/envs/hpc-workshop-f26
 ```
-This list is so lengthy because it includes the packages manually installed (numpy, matplotlib, pandas, R) *and* their dependencies.
 
-If you use the `--from-history` flag, conda will only export the packages you indicated, leaving the conda solver to choose versions and dependencies.
+This list is lengthy because it includes the package manually installed (numpy) *and* its dependencies.
+
+If you use the `--from-history` flag, Conda will only export the packages you instructed it to install, leaving the conda solver to choose versions and dependencies. This approach is less precise but more resilient to cross-platform dependency conflicts.
 
 ```bash
-conda env export --from-history
+conda export -n hpc-workshop-f26 --from-history
 ```
-
 ```output
-name: myenv
+name: hpc-workshop-f26
 channels:
   - defaults
 dependencies:
-  - matplotlib
-  - numpy
   - python=3.12
-  - pandas
-  - r=4.3
+  - numpy
+prefix: /home/emwin/.conda/envs/hpc-workshop-f26
 ```
 
-### Creating A Conda Environment from a .yml File
+### What About `prefix`?
+While the `/prefix/` line indicates where the environment exists on *your* filesystem -- a hidden `.conda` folder in your Talapas home directory -- this line is [ignored by Conda](https://github.com/conda/conda/issues/10466) when environments are created from a file. You do not need to remove this line before passing it on to a colleague.
 
-Let's inspect an environment file called `jupyter.yml` before creating the environment defined there.
+## Creating A Conda Environment from a .yml File
+Because you cannot have two environments with the same name, we'll practice creating a Conda environment from a file with a slightly different environment with a larger selection of popular Python packages.
 
+First, create an environment file called `pandas.yml` with `nano`. 
 ```bash
-cat jupyter.yml
+nano pandas.yml
 ```
-
-```output
-name: jupyter-racs-s25
+```bash
+name: pandas-f26
 channels:
   - conda-forge
 dependencies:
   - numpy
-  - pandas
+  - pandas=3.1.0
   - matplotlib
   - seaborn
-  - jupyter
-  - r-base
-  - r-essentials
-  - r-irkernel
-  - nodejs
+  - jupyterlab=4.6.5
   - ipywidgets
-  - pip
-  - pip:
-    - git+https://github.com/conery/nbscan.git
 ```
 
-### Conda Channels
-This environment file defines an environment named *jupyter-racs-s25*. 
-It uses the **conda-forge** channel. Channels are repositories where packages are downloaded from.
+* Observe that two packages have explicit version requirements in this file: `pandas` and `jupyterlab`.
 
-Conda defaults to a channel called **defaults**. The **conda-forge** channel has a larger repository of packages from the broader community.
+### Conda Channels
+This environment file defines an environment named `pandas-f26` and specifies that packages should be downloaded from the `conda-forge` channel. [Channels](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/channels.html) are repositories from which packages are downloaded.
+
+Conda defaults to an official channel called `defaults`. The `conda-forge` channel has a larger repository of packages from the broader community.
 
 Conda looks for packages in channels in the order that the channels appear.
 
-This environment also uses pip to install a **nbscan** package that is not available through conda.
+If you do not specify version numbers, Conda will select the latest *compatible* version of a given package. 
 
-If you do not specify version numbers, conda will select the latest *compatible* version of a given package. 
-
-Before we can create our new environment, we need to deactivate our current one.
-
-Then, we can create our new environment as defined in `juptyer.yml` using `conda env create`.
-
+We can create our new environment as defined in `pandas.yml` using `conda env create` followed by `-f` to indicate the name of the file to read in.
 ```bash
-conda env create -f jupyter.yml
+conda env create -f pandas.yml
 ```
 
-When the environment building finishes, you will get a message like this.
-
+When the environment finishes building, you will get a message like this.
 ```output
-#                                                               
-# To activate this environment, use                             
-#                     
-#     $ conda activate jupyter-racs-s25
+#
+# To activate this environment, use
+#
+#     $ conda activate pandas-f26
 #
 # To deactivate an active environment, use
 #
 #     $ conda deactivate
 ```
 
-No two conda environments can have the same name, so this command fail if you try to run it a second time.
+No two Conda environments can have the same name, so this command will fail if you try to run it a second time.
 
-We will be using the *jupyter-racs-s25* environment in the JupyterLab session.
+### R in Conda
+You can also install R and R packages to Conda environments. Because Anaconda no longer maintains [an official R channel](https://www.anaconda.com/docs/getting-started/working-with-conda/packages/using-r-language), you must use the community-maintained packages on the `conda-forge` channel to fetch the latest versions from CRAN.
 
-### Using Conda Environments in Batch Scripts
+Activate the newly created `pandas-f26` environment.
+```bash
+conda activate pandas-f26
+```
 
+Using `--channel conda-forge` to indicate you want to install packages from the `conda-forge` channel, install the `r-base` and `r-ggplot2` packages.
+```bash
+conda install --channel conda-forge r-base=4.5.3 r-ggplot2 -y
+```
+```output
+Preparing transaction: done                                                                
+Verifying transaction: done                                                                
+Executing transaction: done  
+```
+
+All Conda versions of R packages are prefixed `r-` to distinguish them from Python packages with similar names.
+
+Because R has been installed inside the current Conda environment, the `R` and `Rscript` commands are available on your path when `pandas-f26` is activated.
+
+```bash
+which R
+```
+```output
+~/.conda/envs/pandas-f26/bin/R
+```
+
+```bash
+which Rscript
+```
+```output
+~/.conda/envs/pandas-f26/bin/Rscript
+```
+
+Deactivate the environment once you've finished adjusting it.
+
+```bash
+conda deactivate
+```
+
+## Using Conda Environments in Batch Scripts
 To use a Conda environment you created in a Slurm batch script, you can add the following lines to your script.
-Don't forget to load `miniconda3/202410` first!
 
-For Python files:
+Don't forget to load `miniconda3` or `miniforge3` first. Make sure to load the precisely the version of `miniconda3` or `miniforge3` you used to create the environment.
+
+### Using Conda with Python Batch Scripts
 ```bash
-module load miniconda3/202410
+module purge
+module load miniconda3/20260319 # Assuming I used this version
 conda activate [env-name]
-python [my-special-python-script].py
+python [python-script].py
+conda deactivate
 ```
 
-Or for R:
+### Using Conda with R Batch Scripts
 ```bash
-module load miniconda3/202410
+module purge
+module load miniconda3/20260319 # Assuming I used this version
 conda activate [env-name]
-R [my-special-r-script].R
+Rscript [r-script].R
+conda deactivate
 ```
 
-### Debugging Conda
+## Debugging Conda
 Observing strange behavior with Conda on Talapas? Make sure you're not loading into a conda environment through your .bashrc file.
 
 A default `.bashrc` looks something like this:
@@ -853,8 +556,8 @@ Do not run the `conda init` command on Talapas to avoid modifying your .bashrc f
 Instead, use `module load` to load either `miniconda3` or `miniforge3`.
 
 ### What About `pip`?
-Pip is an [alternative package manager](https://www.anaconda.com/blog/understanding-conda-and-pip) and it can be paired with `venv` to create Python virtual environments. Using `pip` within a `conda` environment can introduce problems,
-but it can be a necessary evil for packages available in pip but not in conda. 
+Pip is an [alternative package manager](https://www.anaconda.com/blog/understanding-conda-and-pip) and it can be paired with `venv` to create Python virtual environments. Using `pip` within a `conda` environment can introduce problems, so use this approach only when necessary.
+
 
 ### Useful Conda Commands
 
@@ -867,7 +570,9 @@ but it can be a necessary evil for packages available in pip but not in conda.
 | `conda list` | see packages and their versions installed, includes both pip and conda packages | 
 | `conda search <package name>` | searches for packages within your environment | 
 | `conda list --name ENVNAME --show-channel-url` | useful when trying to figure out what channel was used to install what package | 
-| `conda env remove --name <environment name> --all` | deletes a conda environment (make sure you have created a backup) |
+| `conda create` | used to create conda environments either from the command line or from a file |
+| `conda export -n [environment name] > [filename]` | exports a conda environment to a file |
+| `conda env remove --name [environment name] --all` | deletes a conda environment (make sure you have created a backup) |
 
 
 
