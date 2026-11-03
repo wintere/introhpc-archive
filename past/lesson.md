@@ -5,6 +5,7 @@ permalink: /past/lesson.html
 parent: Past Lessons
 nav_enabled: true
 nav_order: 2
+search_exclude: true
 ---
 
 # R on Talapas

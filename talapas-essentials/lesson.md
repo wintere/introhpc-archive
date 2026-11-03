@@ -13,8 +13,8 @@ The Talapas (from Chinook for "coyote") cluster is managed by [Research Advanced
 
 ## RACS Resources:
 * [Talapas Knowledge Base/Documentation](https://uoracs.github.io/talapas2-knowledge-base/)
-* [How to Login to Talapas](https://uoracs.github.io/talapas2-knowledge-base/docs/how-to_articles/how-to_login_to_talapas/)
-* [Talapas Quick Start Guide](https://uoracs.github.io/talapas2-knowledge-base/docs/quickstart_guide/)
+* [How to Login to Talapas](https://uoracs.github.io/talapas2-knowledge-base/docs/connecting_to_talapas/how-to_login_to_talapas/)
+* [Talapas Quick Start Guide](https://uoracs.github.io/talapas2-knowledge-base/docs/quickstart_guide)
 * [Talapas Customer Portal](https://hpcrcf.atlassian.net/servicedesk/customer/portal/1)
 
 

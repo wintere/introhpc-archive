@@ -20,7 +20,6 @@ Copy the following folder into your home directory.
 cp -r  .projects/racs_training/intro-hpc-f26/jupyter-f26/ ~
 ```
 
-
 ## Configuring the OnDemand JupyterLab App
 
 Navigate to the [OnDemand homepage](https://ondemand.talapas.uoregon.edu/pun/sys/dashboard) and login with your **DuckID**.
@@ -43,6 +42,10 @@ From the **Interactive Apps** dropdown menu, select **Jupyter**.
 
 **Use custom conda environment**: To use Jupyter OnDemand with a custom environment, you need to pass in the *name* of the conda environment.
 
+![jupyter app](../images/jupyter-conda.png)*An example Conda configuration using the `pandas-f26` environment.*
+
+To set a custom Conda environment for your Jupyter Lab session, set the name of the module used to build the environment *and* the name of the environment as it appears with the `conda env list` command. 
+
 When you've adjusted your job settings, click the **Launch** button.
 
 ## Launching JupyterLab from Sessions
@@ -59,14 +62,14 @@ JupyterLab supports interaction through Jupyter notebooks in the **Notebook** me
 
 ![jupyter notebook](../images/jupyter-notebook-launcher.png)
 
-A single `conda` environment can have multiple kernels -- for example, we created one that has both an R and Python kernel. 
+A single Conda environment can have multiple kernels -- for example, we created one that has both an R and Python kernel. 
 
 To run Jupyter Notebooks, you will need to select a [kernel](https://jupyterlab.readthedocs.io/en/stable/user/running.html). You should select the **Python 3 (ipykernel)** from the **Notebook** menu to create, edit, and execute Jupyter Notebooks.
 
 After clicking, you will be prompted to select a specific Python kernel. 
 ![kernel select](../images/jupyter-kernel-select.png)
 
-After selecting a kernel, open the `jupyter_examples` folder in your home directory [from within the JupyterLab interface](https://jupyterlab.readthedocs.io/en/stable/user/files.html).
+After selecting a kernel, open the `jupyter-f26` folder in your home directory [from within the JupyterLab interface](https://jupyterlab.readthedocs.io/en/stable/user/files.html).
 
 ## Exercise Notebooks
 
