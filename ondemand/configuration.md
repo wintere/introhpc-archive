@@ -17,7 +17,7 @@ Connect to a Talapas login node through a terminal application of choice or conn
 Copy the following folder into your home directory.
 
 ```bash
-cp -r  .projects/racs_training/intro-hpc-f26/jupyter-f26/ ~
+cp -r  /projects/racs_training/intro-hpc-f26/jupyter-f26/ ~
 ```
 
 ## Configuring the OnDemand JupyterLab App
